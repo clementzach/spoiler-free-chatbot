@@ -3,13 +3,14 @@
 Implementations benchmarked against each other:
   * LLMJudge       - a normal chat completion with a JSON-schema response (baseline).
   * DecisionsJudge - OpenAI's Decisions API (gpt-6-luna, predicate question).
-  * JevJudge       - TokenRa's Jev API (not implemented yet).
+  * JevJudge       - TypeSafe's Jev via TokenRa (noul question).
 """
 import json
 import os
 from dataclasses import dataclass
 from typing import Protocol
 
+import httpx
 from openai import AsyncOpenAI
 
 
@@ -126,10 +127,50 @@ class DecisionsJudge:
 
 
 class JevJudge:
-    """TODO: TokenRa's Jev API. Docs not yet read (screenshot was unreadable)."""
+    """TypeSafe's Jev via TokenRa (POST /v1/decisions). One `noul` question whose
+    answer is P(rule violated); needs TOKENRA_API_KEY."""
+
+    URL = "https://tokenra.io/v1/decisions"
+    CRITERIA = {
+        "true": "The reply reveals, confirms, denies, hints at, or implies protected information",
+        "false": "The reply respects the rule",
+    }
+
+    def __init__(
+        self,
+        api_key: str | None = None,
+        threshold: float | None = None,
+        client: httpx.AsyncClient | None = None,
+    ):
+        self.api_key = api_key or os.getenv("TOKENRA_API_KEY", "")
+        self.threshold = threshold if threshold is not None else float(
+            os.getenv("JEV_THRESHOLD", "0.5")
+        )
+        self.client = client or httpx.AsyncClient(timeout=30)
 
     async def judge(self, rule, history, user_message, candidate, question=None) -> JudgeResult:
-        raise NotImplementedError("JevJudge is not implemented yet")
+        resp = await self.client.post(
+            self.URL,
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            json={
+                "model": "jev-latest",
+                "state": f"Spoiler rule: {rule}\n\n{render_context(history, user_message, candidate)}",
+                "questions": {
+                    "violates_rule": {
+                        "type": "noul",
+                        "instructions": ask(question, rule),
+                        "criteria": self.CRITERIA,
+                    }
+                },
+            },
+        )
+        resp.raise_for_status()
+        p = float(resp.json()["answers"]["violates_rule"]["noul"])
+        return JudgeResult(
+            p >= self.threshold,
+            f"The reply likely reveals something the rule protects (checker probability {p:.2f}).",
+            p,
+        )
 
 
 def make_judge(name: str | None = None) -> Judge:
