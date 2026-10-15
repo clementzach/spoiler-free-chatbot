@@ -1,8 +1,9 @@
 """Judges decide whether a candidate reply violates the user's spoiler rule.
 
-Two implementations are meant to be benchmarked against each other:
-  * LLMJudge       - a normal chat completion with a JSON-schema response.
-  * DecisionsJudge - OpenAI's Decisions API (not implemented yet, see below).
+Implementations benchmarked against each other:
+  * LLMJudge       - a normal chat completion with a JSON-schema response (baseline).
+  * DecisionsJudge - OpenAI's Decisions API (gpt-6-luna, predicate question).
+  * JevJudge       - TokenRa's Jev API (not implemented yet).
 """
 import json
 import os
@@ -16,11 +17,27 @@ from openai import AsyncOpenAI
 class JudgeResult:
     violates: bool
     reason: str = ""
+    score: float | None = None  # P(violation) when the judge reports one
+
+
+DEFAULT_QUESTION = (
+    'Does the candidate reply reveal, confirm, deny, hint at, or imply anything '
+    'the user\'s rule protects? The rule: "{rule}"'
+)
+
+
+def ask(question: str | None, rule: str) -> str:
+    return (question or DEFAULT_QUESTION).replace("{rule}", rule)
 
 
 class Judge(Protocol):
     async def judge(
-        self, rule: str, history: list[dict], user_message: str, candidate: str
+        self,
+        rule: str,
+        history: list[dict],
+        user_message: str,
+        candidate: str,
+        question: str | None = None,
     ) -> JudgeResult: ...
 
 
@@ -60,7 +77,7 @@ class LLMJudge:
         self.client = client or AsyncOpenAI()
         self.model = model or os.getenv("JUDGE_MODEL", "gpt-4.1-mini")
 
-    async def judge(self, rule, history, user_message, candidate) -> JudgeResult:
+    async def judge(self, rule, history, user_message, candidate, question=None) -> JudgeResult:
         resp = await self.client.chat.completions.create(
             model=self.model,
             temperature=0,
@@ -69,7 +86,10 @@ class LLMJudge:
                 {"role": "system", "content": JUDGE_SYSTEM},
                 {
                     "role": "user",
-                    "content": f"RULE: {rule}\n\n{render_context(history, user_message, candidate)}",
+                    "content": (
+                        f"RULE: {rule}\n\nQUESTION: {ask(question, rule)}\n\n"
+                        f"{render_context(history, user_message, candidate)}"
+                    ),
                 },
             ],
         )
@@ -78,17 +98,38 @@ class LLMJudge:
 
 
 class DecisionsJudge:
-    """TODO: implement against https://developers.openai.com/api/docs/guides/decisions.
+    """OpenAI Decisions API: one `predicate` question, P(rule violated) vs a threshold."""
 
-    The docs were unreachable when this was scaffolded, so the request shape is not
-    guessed here. Define two answers (e.g. "ok" / "spoiler"), pass the same inputs
-    LLMJudge sees (rule, recent conversation, candidate), and map the chosen answer
-    to JudgeResult(violates=...). If the API returns no explanation, use a generic
-    reason; the retry prompt still works without one.
-    """
+    def __init__(self, client: AsyncOpenAI | None = None, threshold: float | None = None):
+        self.client = client or AsyncOpenAI()
+        self.threshold = threshold if threshold is not None else float(
+            os.getenv("DECISIONS_THRESHOLD", "0.5")
+        )
 
-    async def judge(self, rule, history, user_message, candidate) -> JudgeResult:
-        raise NotImplementedError("DecisionsJudge is not implemented yet")
+    async def judge(self, rule, history, user_message, candidate, question=None) -> JudgeResult:
+        decision = await self.client.decisions.create(
+            model="gpt-6-luna",
+            input=f"Spoiler rule: {rule}\n\n{render_context(history, user_message, candidate)}",
+            questions=[
+                {"type": "predicate", "name": "violates_rule", "instructions": ask(question, rule)}
+            ],
+        )
+        answer = decision.answers[0]
+        if answer.type != "predicate":  # refusal or anything unexpected: fail closed
+            return JudgeResult(True, f"checker returned {answer.type}", None)
+        p = answer.probability
+        return JudgeResult(
+            p >= self.threshold,
+            f"The reply likely reveals something the rule protects (checker probability {p:.2f}).",
+            p,
+        )
+
+
+class JevJudge:
+    """TODO: TokenRa's Jev API. Docs not yet read (screenshot was unreadable)."""
+
+    async def judge(self, rule, history, user_message, candidate, question=None) -> JudgeResult:
+        raise NotImplementedError("JevJudge is not implemented yet")
 
 
 def make_judge(name: str | None = None) -> Judge:
@@ -97,4 +138,6 @@ def make_judge(name: str | None = None) -> Judge:
         return LLMJudge()
     if name == "decisions":
         return DecisionsJudge()
+    if name == "jev":
+        return JevJudge()
     raise ValueError(f"unknown judge {name!r}")

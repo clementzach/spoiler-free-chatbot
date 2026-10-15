@@ -1,30 +1,50 @@
-"""Benchmark judges on labelled (rule, response, violates) cases.
+"""Benchmark judges on YAML cases in bench/cases/.
 
-Usage: python -m bench.run [llm decisions ...]
+Usage: python -m bench.run [--judges llm decisions jev] [--only ID ...] [-v]
 
-Reports, per judge: accuracy, missed leaks (false negatives - the costly error),
-over-blocks (false positives), error count and mean latency. A judge that raises
-NotImplementedError is skipped.
+Each case file has three editable parts (context, response, judge) plus the
+`expected` label. See bench/cases/_template.yaml. Reports per judge: accuracy,
+missed leaks (false negatives, the costly error), over-blocks (false positives),
+errors and mean latency. A judge raising NotImplementedError is skipped.
 """
+import argparse
 import asyncio
-import json
-import sys
 import time
 from pathlib import Path
 
+import yaml
+
 from app.judges import make_judge
 
-CASES = [json.loads(l) for l in (Path(__file__).parent / "cases.jsonl").read_text().splitlines() if l.strip()]
+CASE_DIR = Path(__file__).parent / "cases"
 
 
-async def run(name: str) -> None:
+def load_cases(only: list[str] | None = None) -> list[dict]:
+    cases = []
+    for path in sorted(CASE_DIR.glob("*.yaml")):
+        if path.name.startswith("_"):
+            continue
+        c = yaml.safe_load(path.read_text())
+        c["id"] = path.stem
+        if c["expected"] not in ("violates", "ok"):
+            raise ValueError(f"{path.name}: expected must be 'violates' or 'ok'")
+        if not only or c["id"] in only:
+            cases.append(c)
+    return cases
+
+
+async def run(name: str, cases: list[dict], verbose: bool) -> None:
     judge = make_judge(name)
     tp = tn = fp = fn = errors = 0
     times, misses = [], []
-    for c in CASES:
+    for c in cases:
+        ctx = c["context"]
         t0 = time.perf_counter()
         try:
-            v = await judge.judge(c["rule"], c.get("history", []), c["user"], c["response"])
+            v = await judge.judge(
+                ctx["rule"], ctx.get("history") or [], ctx["user_message"],
+                c["response"], (c.get("judge") or {}).get("question"),
+            )
         except NotImplementedError:
             print(f"[{name}] not implemented, skipping")
             return
@@ -33,10 +53,14 @@ async def run(name: str) -> None:
             print(f"[{name}] {c['id']}: error {type(exc).__name__}: {exc}")
             continue
         times.append(time.perf_counter() - t0)
-        if c["violates"] and v.violates: tp += 1
-        elif c["violates"]: fn += 1; misses.append(c["id"])
+        want = c["expected"] == "violates"
+        if want and v.violates: tp += 1
+        elif want: fn += 1; misses.append(c["id"])
         elif v.violates: fp += 1
         else: tn += 1
+        if verbose:
+            score = f" p={v.score:.2f}" if v.score is not None else ""
+            print(f"  {c['id']}: want={c['expected']} got={'violates' if v.violates else 'ok'}{score}")
     n = tp + tn + fp + fn
     print(f"[{name}] n={n} accuracy={(tp + tn) / max(n, 1):.0%} missed_leaks={fn} over_blocks={fp} "
           f"errors={errors} mean_latency={sum(times) / max(len(times), 1):.2f}s")
@@ -45,8 +69,14 @@ async def run(name: str) -> None:
 
 
 async def main() -> None:
-    for name in sys.argv[1:] or ["llm", "decisions"]:
-        await run(name)
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--judges", nargs="+", default=["llm", "decisions", "jev"])
+    ap.add_argument("--only", nargs="+")
+    ap.add_argument("-v", "--verbose", action="store_true")
+    a = ap.parse_args()
+    cases = load_cases(a.only)
+    for name in a.judges:
+        await run(name, cases, a.verbose)
 
 
 if __name__ == "__main__":

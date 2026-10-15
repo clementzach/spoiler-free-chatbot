@@ -1,0 +1,9 @@
+context:
+  rule: Don't tell me anything about the plot of Dune past the first 100 pages
+  history: []
+  user_message: What is spice?
+response: 'Spice (melange) is the most valuable substance in the universe of Dune: it extends life, enhances
+  awareness and makes interstellar navigation possible. It''s only found on Arrakis.'
+judge:
+  question: null  # null = default question; {rule} is substituted
+expected: ok
