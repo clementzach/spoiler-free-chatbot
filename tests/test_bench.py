@@ -49,27 +49,23 @@ async def test_decisions_refusal_fails_closed():
     assert (await judge_with(Ans("refusal")).judge("r", [], "q", "c")).violates
 
 
+class FakeSystemOne:
+    def __init__(self, p):
+        self.p, self.kwargs = p, None
+
+    async def system_one(self, **kw):
+        self.kwargs = kw
+        return type("R", (), {"nouls": {"violates_rule": type("N", (), {"noul": self.p})()}})()
+
+
 @pytest.mark.asyncio
 async def test_jev_request_shape_and_threshold():
-    import httpx
-
     from app.judges import JevJudge
 
-    seen = {}
-
-    def handler(request):
-        import json
-
-        seen["auth"] = request.headers["authorization"]
-        seen["body"] = json.loads(request.content)
-        return httpx.Response(200, json={"answers": {"violates_rule": {"type": "noul", "noul": 0.7}}})
-
-    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
-    j = JevJudge(api_key="k", threshold=0.5, client=client)
-    r = await j.judge("no ending", [], "q", "reply", "Custom? {rule}")
+    fake = FakeSystemOne(0.7)
+    r = await JevJudge(client=fake, threshold=0.5).judge("no ending", [], "q", "reply", "Custom? {rule}")
     assert r.violates and r.score == 0.7
-    assert seen["auth"] == "Bearer k"
-    q = seen["body"]["questions"]["violates_rule"]
-    assert seen["body"]["model"] == "jev-latest" and q["type"] == "noul"
-    assert q["instructions"] == "Custom? no ending" and set(q["criteria"]) == {"true", "false"}
-    assert not (await JevJudge(api_key="k", threshold=0.9, client=client).judge("r", [], "q", "c")).violates
+    q = fake.kwargs["questions"]["violates_rule"]
+    assert q.type == "noul" and q.instructions == "Custom? no ending"
+    assert set(q.criteria) == {"true", "false"} and "reply" in fake.kwargs["state"]
+    assert not (await JevJudge(client=fake, threshold=0.9).judge("r", [], "q", "c")).violates

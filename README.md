@@ -21,4 +21,4 @@ Copy `bench/cases/_template.yaml` to add one.
     .venv/bin/python -m bench.run --only sw-hint hp-reassure
 
 Judges: `llm` (chat-completion baseline), `decisions` (OpenAI Decisions API, predicate
-question thresholded at `DECISIONS_THRESHOLD`, default 0.5), `jev` (TypeSafe's Jev via TokenRa, `noul` question thresholded at `JEV_THRESHOLD`, default 0.5; needs `TOKENRA_API_KEY`).
+question thresholded at `DECISIONS_THRESHOLD`, default 0.5), `jev` (TypeSafe's Jev via `typesafe-sdk`, `noul` question thresholded at `JEV_THRESHOLD`, default 0.5; needs `TYPESAFE_API_KEY`).
