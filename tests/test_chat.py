@@ -67,3 +67,22 @@ async def test_rejected_drafts_not_in_next_turn_context():
     seen2 = []
     await respond(make_generate(["next"], seen2), ScriptedJudge([OK]), "ch. 3", history, "more")
     assert all("spoiler" != m["content"] for m in seen2[0])
+
+
+@pytest.mark.asyncio
+async def test_openai_generate_uses_responses_api_with_web_search():
+    from types import SimpleNamespace
+
+    from app.chat import openai_generate
+
+    calls = []
+
+    async def create(**kw):
+        calls.append(kw)
+        return SimpleNamespace(output_text="grounded")
+
+    client = SimpleNamespace(responses=SimpleNamespace(create=create))
+    msgs = [{"role": "user", "content": "hi"}]
+    assert await openai_generate(client)(msgs) == "grounded"
+    assert calls[0]["model"] == "gpt-6-luna" and calls[0]["input"] == msgs
+    assert calls[0]["tools"] == [{"type": "web_search"}]

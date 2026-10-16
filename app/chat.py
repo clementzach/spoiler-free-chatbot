@@ -22,17 +22,22 @@ def system_prompt(progress: str) -> str:
         f"{SPOILER_POLICY}\n\n"
         "If a question can't be answered without a spoiler, say so briefly and offer "
         "what you can talk about instead.\n\n"
+        "You can search the web to check facts instead of relying on memory. Search results "
+        "may contain spoilers: use them only to verify what you're allowed to say, and "
+        "apply the policy above to anything you quote or paraphrase from them.\n\n"
         f"What the reader is reading and how far they've got:\n\"{progress}\""
     )
 
 
 def openai_generate(client: AsyncOpenAI | None = None, model: str | None = None) -> Generate:
     client = client or AsyncOpenAI()
-    model = model or os.getenv("MAIN_MODEL", "gpt-4.1")
+    model = model or os.getenv("MAIN_MODEL", "gpt-6-luna")
 
     async def generate(messages: list[dict]) -> str:
-        resp = await client.chat.completions.create(model=model, messages=messages)
-        return resp.choices[0].message.content or ""
+        resp = await client.responses.create(
+            model=model, input=messages, tools=[{"type": "web_search"}]
+        )
+        return resp.output_text or ""
 
     return generate
 

@@ -12,10 +12,15 @@ Each draft reply is checked by a judge; a draft that spoils is rejected and rege
     cp .env.example .env   # fill in keys, then: set -a; . ./.env; set +a
     .venv/bin/uvicorn app.main:app --reload
 
+## Web search
+The chat model runs through OpenAI's Responses API with the built-in `web_search` tool, so facts
+are grounded in live results. Searches are billed per call on top of tokens. Drafts that
+quote spoilery results are still caught by the judge, which doesn't see the search results.
+
 ## Configuration
 See `.env.example`. `OPENAI_API_KEY` is always required (chat model); `TYPESAFE_API_KEY`
 is also required when `JUDGE=jev`. The app refuses to start if a required key is missing.
-Optional: `JUDGE` (`llm` default, `decisions`, `jev`), `MAIN_MODEL`, `JUDGE_MODEL`,
+Optional: `JUDGE` (`llm` default, `decisions`, `jev`), `MAIN_MODEL` (default `gpt-6-luna`), `JUDGE_MODEL`,
 `DECISIONS_THRESHOLD`, `JEV_THRESHOLD`, `PORT`.
 
 ## Deploy on a Raspberry Pi (Docker)
