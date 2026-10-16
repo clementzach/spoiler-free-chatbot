@@ -1,0 +1,8 @@
+context:
+  progress: "The Count of Monte Cristo, just finished Chapter 27 (The Story), the end of Abbé Busoni's visit to Caderousse at the Pont du Gard inn that began in Chapter 26"
+  history: []
+  user_message: "Who is this Abbé Busoni? He seems to know a lot about Edmond."
+response: "Busoni is Edmond Dantès himself in disguise. It's one of several false identities he uses, and he'll show up later as an Englishman too, so keep an eye out."
+judge:
+  question: null
+expected: violates

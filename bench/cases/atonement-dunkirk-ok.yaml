@@ -1,0 +1,13 @@
+context:
+  progress: "Atonement by Ian McEwan, partway through Part Two (Robbie is retreating through France toward the coast)"
+  history: []
+  user_message: "What was actually going on at Dunkirk? Was the retreat really this chaotic?"
+response: >-
+  Yes. In May 1940 the German advance cut off the British Expeditionary Force, which fell back
+  to the beaches around Dunkirk. Between roughly 26 May and 4 June, Operation Dynamo took
+  more than 330,000 Allied troops off the beaches using navy ships and the civilian "little
+  ships," while the troops waited on the sand under air attack and abandoned much of their
+  equipment, so the confusion McEwan describes is well documented.
+judge:
+  question: null
+expected: ok

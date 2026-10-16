@@ -42,7 +42,7 @@ async def run(name: str, cases: list[dict], verbose: bool) -> None:
         t0 = time.perf_counter()
         try:
             v = await judge.judge(
-                ctx["rule"], ctx.get("history") or [], ctx["user_message"],
+                ctx["progress"], ctx.get("history") or [], ctx["user_message"],
                 c["response"], (c.get("judge") or {}).get("question"),
             )
         except NotImplementedError:

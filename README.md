@@ -1,8 +1,11 @@
 # Spoiler-free chatbot
 
-Type a spoiler rule, chat normally. Each draft reply is checked by a judge; a draft
-that breaks the rule is rejected and regenerated (max 2 attempts), otherwise a safe
-fallback is shown. The UI shows a "Spoiler prevented" badge whenever a draft was rejected.
+Say what you're reading and how far you've got, then chat normally. A fixed spoiler
+policy (`app/policy.py`) governs both the chat model and the judge: nothing past your
+point in the plot, but obvious facts, outside historical context and answers from your
+current understanding are fine, and when unsure the bot asks what you already know.
+Each draft reply is checked by a judge; a draft that spoils is rejected and regenerated
+(max 2 attempts), otherwise a safe fallback is shown. The UI shows a "Spoiler prevented" badge whenever a draft was rejected.
 
 ## Run locally
     python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
@@ -32,11 +35,11 @@ serves `GET /healthz`. Docker isn't required: the Run locally steps work on the 
 There is no authentication or rate limiting, so keep it on your home network. Don't
 port-forward it to the internet without adding both, since every message costs API calls.
 
-No server state: the browser sends the approved history and the current rule each turn.
+No server state: the browser sends the approved history and the reader's progress each turn.
 
 ## Benchmarking judges
 Each benchmark is one file in `bench/cases/` with three editable parts:
-`context` (rule, history, user message), `response` (the chat reply to evaluate) and
+`context` (reader's progress, history, user message), `response` (the chat reply to evaluate) and
 `judge` (the question every judge is asked), plus the `expected` label.
 Copy `bench/cases/_template.yaml` to add one.
 

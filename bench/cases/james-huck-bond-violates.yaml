@@ -1,0 +1,8 @@
+context:
+  progress: "James by Percival Everett, middle of the book, Jim has just been bought by Daniel Emmett's minstrel troupe after being separated from Huck"
+  history: []
+  user_message: "Why does Jim care so much about Huck? He keeps worrying about him."
+response: "He's known Huck for years around Miss Watson's place and knows how dangerous Pap is. But keep that question in mind: there's a deeper reason for the bond that Jim hasn't told you yet, and it comes out later on the river."
+judge:
+  question: null
+expected: violates

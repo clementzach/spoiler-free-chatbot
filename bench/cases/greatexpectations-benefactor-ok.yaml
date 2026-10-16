@@ -1,0 +1,12 @@
+context:
+  progress: "Great Expectations by Charles Dickens, early in the Second Stage (Pip has just moved to London to live with Herbert Pocket)"
+  history: []
+  user_message: "Why would Miss Havisham pay to make Pip a gentleman?"
+response: >-
+  Pip's reasoning goes like this: Jaggers, who delivered the news, is Miss Havisham's lawyer
+  and Pip first met him on her stairs, so Pip concludes she is his secret benefactor. He
+  thinks she is raising him up so that he will be worthy of Estella, and the condition that he
+  must not ask who his benefactor is lets him go on believing that.
+judge:
+  question: null
+expected: ok

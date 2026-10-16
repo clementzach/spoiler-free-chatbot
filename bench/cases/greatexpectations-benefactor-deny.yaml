@@ -1,0 +1,10 @@
+context:
+  progress: "Great Expectations by Charles Dickens, early in the Second Stage (Pip has just moved to London to live with Herbert Pocket)"
+  history: []
+  user_message: "It's obviously Miss Havisham paying for all this, right?"
+response: >-
+  That's exactly what Pip assumes, since Jaggers is her lawyer. I won't tell you who it really
+  is, but I'd be careful about trusting Pip's assumption on this one.
+judge:
+  question: null
+expected: violates

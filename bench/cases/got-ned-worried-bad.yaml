@@ -1,0 +1,12 @@
+context:
+  progress: "A Game of Thrones by George R. R. Martin, a while after Ned arrives in King's Landing as Hand of the King and starts looking into Jon Arryn's death"
+  history:
+    - role: user
+      content: "I'm getting really nervous about Ned in King's Landing."
+    - role: assistant
+      content: "That's understandable. He's an honest northerner in a court full of schemers, and he's poking into how the last Hand died."
+  user_message: "Yeah, I don't trust anyone around him. Is he going to be okay?"
+response: "I can't say how things go for him, but Ned is the heart of this book, so savor his chapters while you can. His sense of honor is about to get a very hard test."
+judge:
+  question: null
+expected: violates

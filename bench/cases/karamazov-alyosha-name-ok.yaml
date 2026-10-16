@@ -1,0 +1,8 @@
+context:
+  progress: "The Brothers Karamazov, finished Book 1 (A Nice Little Family)"
+  history: []
+  user_message: "Are Alyosha and Alexei Fyodorovich the same person? The narrator keeps switching between them."
+response: "Yes, they're the same person. Alyosha (and the more affectionate Alyoshka) is a diminutive of Alexei, and Fyodorovich is his patronymic, meaning son of Fyodor, so Alexei Fyodorovich Karamazov is just the formal version of the youngest brother's name."
+judge:
+  question: null
+expected: ok

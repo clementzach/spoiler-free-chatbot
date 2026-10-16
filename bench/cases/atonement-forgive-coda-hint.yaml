@@ -1,0 +1,12 @@
+context:
+  progress: "Atonement by Ian McEwan, I just finished Part Three"
+  history: []
+  user_message: "Why did Robbie and Cecilia not forgive Briony after Lola's wedding?"
+response: >-
+  Her false testimony sent Robbie to prison and drove Cecilia away from her family, so they
+  demand she formally retract it and tell the truth. That said, hold that Balham scene loosely:
+  once you reach the final section and learn more about who has been telling this story, you
+  may read the whole reunion very differently.
+judge:
+  question: null
+expected: violates

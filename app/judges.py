@@ -1,4 +1,4 @@
-"""Judges decide whether a candidate reply violates the user's spoiler rule.
+"""Judges decide whether a candidate reply spoils anything past the reader's progress.
 
 Implementations benchmarked against each other:
   * LLMJudge       - a normal chat completion with a JSON-schema response (baseline).
@@ -13,6 +13,8 @@ from typing import Protocol
 from openai import AsyncOpenAI
 from typesafe_sdk import AsyncTypeSafeClient, Noul
 
+from .policy import SPOILER_POLICY
+
 
 @dataclass
 class JudgeResult:
@@ -22,19 +24,19 @@ class JudgeResult:
 
 
 DEFAULT_QUESTION = (
-    'Does the candidate reply reveal, confirm, deny, hint at, or imply anything '
-    'the user\'s rule protects? The rule: "{rule}"'
+    "Does the candidate reply reveal, confirm, deny, hint at, or imply any plot detail "
+    'from beyond the reader\'s progress? Reader\'s progress: "{progress}"'
 )
 
 
-def ask(question: str | None, rule: str) -> str:
-    return (question or DEFAULT_QUESTION).replace("{rule}", rule)
+def ask(question: str | None, progress: str) -> str:
+    return (question or DEFAULT_QUESTION).replace("{progress}", progress)
 
 
 class Judge(Protocol):
     async def judge(
         self,
-        rule: str,
+        progress: str,
         history: list[dict],
         user_message: str,
         candidate: str,
@@ -42,17 +44,18 @@ class Judge(Protocol):
     ) -> JudgeResult: ...
 
 
-JUDGE_SYSTEM = """You are a strict spoiler checker. The user gave a rule about what \
-they do NOT want to learn. Decide whether the assistant's candidate reply violates it.
+JUDGE_SYSTEM = f"""You are a spoiler checker. An assistant must follow this policy:
 
-Count as a violation: stating the protected information, confirming or denying it, \
-hinting at it, or implying it (e.g. "don't worry, he's fine", "I can't say whether \
-she dies" when that itself reveals something). Judge the reply in the context of the \
-user's question and the recent conversation. Do not flag harmless information the rule \
-does not cover. Information about other books/films/parts that the rule does not \
-mention is not a violation.
+{SPOILER_POLICY}
 
-Respond with JSON: {"violates": bool, "reason": "<one sentence, no spoilers repeated>"}."""
+Decide whether the assistant's candidate reply breaks the policy for this reader. Judge \
+it in the context of the reader's question and the recent conversation. Flag any plot \
+detail from beyond the reader's progress, however indirect. Do not flag what the policy \
+allows: content up to their point, obvious facts, how the world's magic or technology \
+works as explained so far, outside historical context, answers \
+given from the reader's current understanding, or open-ended clarifying questions.
+
+Respond with JSON: {{"violates": bool, "reason": "<one sentence, no spoilers repeated>"}}."""
 
 SCHEMA = {
     "name": "spoiler_verdict",
@@ -73,12 +76,18 @@ def render_context(history: list[dict], user_message: str, candidate: str) -> st
     return "Recent conversation:\n" + "\n".join(lines) + f"\n\nCANDIDATE REPLY:\n{candidate}"
 
 
+def state(progress: str, history: list[dict], user_message: str, candidate: str) -> str:
+    """Input for the API judges, which take no system prompt: policy, progress, context."""
+    return (f"Spoiler policy:\n{SPOILER_POLICY}\n\nReader's progress: {progress}\n\n"
+            f"{render_context(history, user_message, candidate)}")
+
+
 class LLMJudge:
     def __init__(self, client: AsyncOpenAI | None = None, model: str | None = None):
         self.client = client or AsyncOpenAI()
         self.model = model or os.getenv("JUDGE_MODEL", "gpt-4.1-mini")
 
-    async def judge(self, rule, history, user_message, candidate, question=None) -> JudgeResult:
+    async def judge(self, progress, history, user_message, candidate, question=None) -> JudgeResult:
         resp = await self.client.chat.completions.create(
             model=self.model,
             temperature=0,
@@ -88,7 +97,7 @@ class LLMJudge:
                 {
                     "role": "user",
                     "content": (
-                        f"RULE: {rule}\n\nQUESTION: {ask(question, rule)}\n\n"
+                        f"READER'S PROGRESS: {progress}\n\nQUESTION: {ask(question, progress)}\n\n"
                         f"{render_context(history, user_message, candidate)}"
                     ),
                 },
@@ -99,7 +108,7 @@ class LLMJudge:
 
 
 class DecisionsJudge:
-    """OpenAI Decisions API: one `predicate` question, P(rule violated) vs a threshold."""
+    """OpenAI Decisions API: one `predicate` question, P(spoiler) vs a threshold."""
 
     def __init__(self, client: AsyncOpenAI | None = None, threshold: float | None = None):
         self.client = client or AsyncOpenAI()
@@ -107,12 +116,12 @@ class DecisionsJudge:
             os.getenv("DECISIONS_THRESHOLD", "0.5")
         )
 
-    async def judge(self, rule, history, user_message, candidate, question=None) -> JudgeResult:
+    async def judge(self, progress, history, user_message, candidate, question=None) -> JudgeResult:
         decision = await self.client.decisions.create(
             model="gpt-6-luna",
-            input=f"Spoiler rule: {rule}\n\n{render_context(history, user_message, candidate)}",
+            input=state(progress, history, user_message, candidate),
             questions=[
-                {"type": "predicate", "name": "violates_rule", "instructions": ask(question, rule)}
+                {"type": "predicate", "name": "violates_rule", "instructions": ask(question, progress)}
             ],
         )
         answer = decision.answers[0]
@@ -121,18 +130,18 @@ class DecisionsJudge:
         p = answer.probability
         return JudgeResult(
             p >= self.threshold,
-            f"The reply likely reveals something the rule protects (checker probability {p:.2f}).",
+            f"The reply likely reveals a plot detail past the reader's progress (checker probability {p:.2f}).",
             p,
         )
 
 
 class JevJudge:
     """TypeSafe's Jev via the TypeSafe SDK. One `noul` question whose answer is
-    P(rule violated); the client reads TYPESAFE_API_KEY."""
+    P(spoiler); the client reads TYPESAFE_API_KEY."""
 
     CRITERIA = {
-        "true": "The reply reveals, confirms, denies, hints at, or implies protected information",
-        "false": "The reply respects the rule",
+        "true": "The reply reveals, confirms, denies, hints at, or implies a plot detail past the reader's progress",
+        "false": "The reply contains no spoilers for this reader",
     }
 
     def __init__(self, client: AsyncTypeSafeClient | None = None, threshold: float | None = None):
@@ -147,17 +156,17 @@ class JevJudge:
             self._client = AsyncTypeSafeClient(model="jev-latest")
         return self._client
 
-    async def judge(self, rule, history, user_message, candidate, question=None) -> JudgeResult:
+    async def judge(self, progress, history, user_message, candidate, question=None) -> JudgeResult:
         response = await self.client.system_one(
-            state=f"Spoiler rule: {rule}\n\n{render_context(history, user_message, candidate)}",
+            state=state(progress, history, user_message, candidate),
             questions={
-                "violates_rule": Noul(instructions=ask(question, rule), criteria=self.CRITERIA)
+                "violates_rule": Noul(instructions=ask(question, progress), criteria=self.CRITERIA)
             },
         )
         p = float(response.nouls["violates_rule"].noul)
         return JudgeResult(
             p >= self.threshold,
-            f"The reply likely reveals something the rule protects (checker probability {p:.2f}).",
+            f"The reply likely reveals a plot detail past the reader's progress (checker probability {p:.2f}).",
             p,
         )
 

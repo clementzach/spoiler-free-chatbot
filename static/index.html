@@ -10,9 +10,9 @@
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui,sans-serif; display:flex; flex-direction:column; height:100dvh; }
   header { padding:12px 16px; border-bottom:1px solid var(--line); display:grid; gap:8px; }
-  .rule-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .progress-row { display:flex; gap:8px; flex-wrap:wrap; }
   textarea, input { font:inherit; color:inherit; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px 10px; }
-  #rule { flex:1 1 260px; resize:vertical; min-height:44px; }
+  #progress { flex:1 1 260px; resize:vertical; min-height:44px; }
   button { font:inherit; border:1px solid var(--line); background:var(--bot); color:inherit; border-radius:8px; padding:8px 12px; cursor:pointer; }
   button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
   button:disabled { opacity:.5; cursor:default; }
@@ -29,21 +29,21 @@
 </head>
 <body>
 <header>
-  <div class="rule-row">
-    <textarea id="rule" placeholder='Spoiler rule, e.g. "Do not tell me how Star Wars IV ends, only the general universe"'></textarea>
-    <button id="setRule" class="primary" type="button">Set rule</button>
-    <button id="showRule" type="button">Current rule</button>
+  <div class="progress-row">
+    <textarea id="progress" placeholder='What are you reading, and how far are you? e.g. "Atonement, just finished Part Two"'></textarea>
+    <button id="setProgress" class="primary" type="button">Set progress</button>
+    <button id="showProgress" type="button">Current progress</button>
   </div>
   <div id="current"></div>
 </header>
 <div id="log" aria-live="polite"></div>
 <form id="form">
-  <input id="msg" placeholder="Set a rule first, then chat" autocomplete="off" disabled>
+  <input id="msg" placeholder="Say what you're reading first, then chat" autocomplete="off" disabled>
   <button id="send" class="primary" disabled>Send</button>
 </form>
 <script>
 const $ = id => document.getElementById(id);
-let rule = "";      // committed rule; sent with every message
+let progress = "";  // what they're reading and how far; sent with every message
 let history = [];   // approved turns only
 
 function add(cls, text) {
@@ -53,35 +53,35 @@ function add(cls, text) {
   return el;
 }
 
-$("setRule").onclick = () => {
-  const v = $("rule").value.trim();
-  if (!v || v === rule) return;
-  add("note", rule ? `Rule changed to: ${v}` : `Rule set: ${v}`);
-  rule = v;
+$("setProgress").onclick = () => {
+  const v = $("progress").value.trim();
+  if (!v || v === progress) return;
+  add("note", progress ? `Progress updated: ${v}` : `Reading: ${v}`);
+  progress = v;
   $("msg").disabled = $("send").disabled = false;
   $("msg").placeholder = "Ask something...";
   $("current").style.display = "none";
 };
 
-$("showRule").onclick = () => {
+$("showProgress").onclick = () => {
   const box = $("current");
-  const pending = $("rule").value.trim() !== rule && $("rule").value.trim();
-  box.textContent = rule
-    ? `Active rule: ${rule}` + (pending ? "  (you have unsaved edits - press Set rule)" : "")
-    : "No rule set yet.";
+  const pending = $("progress").value.trim() !== progress && $("progress").value.trim();
+  box.textContent = progress
+    ? `Reading: ${progress}` + (pending ? "  (you have unsaved edits - press Set progress)" : "")
+    : "Nothing set yet.";
   box.style.display = box.style.display === "block" ? "none" : "block";
 };
 
 $("form").onsubmit = async e => {
   e.preventDefault();
   const message = $("msg").value.trim();
-  if (!message || !rule) return;
+  if (!message || !progress) return;
   $("msg").value = ""; $("send").disabled = true;
   add("msg user", message);
   const wait = add("note", "Checking for spoilers...");
   try {
     const r = await fetch("/chat", { method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ rule, message, history }) });
+      body: JSON.stringify({ progress, message, history }) });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const d = await r.json();
     wait.remove();

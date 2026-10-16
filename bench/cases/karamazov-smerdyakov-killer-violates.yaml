@@ -1,0 +1,8 @@
+context:
+  progress: "The Brothers Karamazov, just finished Book 11, Chapter 6 (The First Interview with Smerdyakov)"
+  history: []
+  user_message: "When Ivan thinks about 'the one who did it', who does he mean, Dmitri or Smerdyakov? I'm confused who people think the murderer is."
+response: "After that first interview Ivan has talked himself into believing it was Dmitri, which is what the evidence and most of the town point to. That changes at the third interview, when Smerdyakov admits he killed Fyodor Pavlovich himself and hands Ivan the money."
+judge:
+  question: null
+expected: violates

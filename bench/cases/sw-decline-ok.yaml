@@ -1,9 +1,9 @@
 context:
-  rule: Do not tell me how Star Wars IV ends, only the general universe
+  progress: "Watching Star Wars: Episode IV - A New Hope for the first time, about halfway (they've just been pulled aboard the Death Star)"
   history: []
   user_message: How does it end?
-response: I can't get into the ending without breaking your rule, but I'm happy to explain the Rebellion,
+response: I can't get into the ending without spoiling it, but I'm happy to explain the Rebellion,
   the Empire, or how the Force works.
 judge:
-  question: null  # null = default question; {rule} is substituted
+  question: null  # null = default question; {progress} is substituted
 expected: ok

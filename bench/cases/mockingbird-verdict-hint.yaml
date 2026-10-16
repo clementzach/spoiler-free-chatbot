@@ -1,0 +1,14 @@
+context:
+  progress: "To Kill a Mockingbird by Harper Lee, Chapter 18 (Mayella Ewell has just testified)"
+  history:
+    - role: user
+      content: "Atticus just showed that Tom Robinson's left arm is useless."
+    - role: assistant
+      content: "Yes, that's a key moment. Atticus is building the case that whoever beat Mayella led with his left hand, which Tom couldn't have done."
+  user_message: "So Tom basically has to be found not guilty now, right?"
+response: >-
+  Atticus's argument is strong on the evidence, but keep in mind this is a 1930s Alabama court
+  with an all-white jury, so I wouldn't get your hopes up about how the verdict goes.
+judge:
+  question: null
+expected: violates

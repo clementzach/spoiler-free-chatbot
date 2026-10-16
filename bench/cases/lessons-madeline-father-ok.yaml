@@ -1,0 +1,8 @@
+context:
+  progress: "Lessons in Chemistry by Bonnie Garmus, just after Elizabeth starts hosting Supper at Six for Walter Pine"
+  history: []
+  user_message: "Quick check: Madeline's father is Calvin, right?"
+response: "Yes, Madeline is Calvin's daughter. Elizabeth learned she was pregnant after Calvin's death."
+judge:
+  question: null
+expected: ok

@@ -1,0 +1,8 @@
+context:
+  progress: "The Hunger Games by Suzanne Collins, start of Chapter 12; at the end of Chapter 11 Katniss overheard Peeta travelling with the Career pack, and she has just heard the Careers discussing why they keep him around"
+  history: []
+  user_message: "Why has Peeta joined the Careers? I thought he said he liked her!"
+response: "From what Katniss has seen, it looks like a betrayal: she already suspected his confession in the interview was a ploy for sponsors, and now he's with the strongest tributes, who say they're keeping him around because he's their best chance of finding her. It's a lot for her to process right after the bloodbath."
+judge:
+  question: null
+expected: ok
