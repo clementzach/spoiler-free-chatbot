@@ -15,18 +15,22 @@ is also required when `JUDGE=jev`. The app refuses to start if a required key is
 Optional: `JUDGE` (`llm` default, `decisions`, `jev`), `MAIN_MODEL`, `JUDGE_MODEL`,
 `DECISIONS_THRESHOLD`, `JEV_THRESHOLD`, `PORT`.
 
-## Deploy (Docker)
-    docker build -t spoiler-free-chatbot .
-    docker run --env-file .env -p 8000:8000 spoiler-free-chatbot
-    # or: docker compose up --build
+## Deploy on a Raspberry Pi (Docker)
+Use a 64-bit Raspberry Pi OS on a Pi 3/4/5 (the Python dependencies ship prebuilt arm64
+wheels; 32-bit may try to compile them). Install Docker, then:
 
-The image runs as a non-root user, listens on `$PORT` (default 8000) and serves
-`GET /healthz` for health checks. It works on any container host (Fly, Render, Cloud Run,
-ECS...): set the env vars as secrets there. The server holds no state, so you can run
-several instances. Put it behind HTTPS (the host usually does this).
+    git clone <this repo> && cd spoiler-free-chatbot
+    cp .env.example .env    # add your keys
+    docker compose up -d --build
 
-Warning: there is no authentication or rate limiting, and every message costs API calls.
-Don't expose a public instance without adding one or both at the proxy or app level.
+The compose file uses `restart: unless-stopped`, so with Docker enabled at boot
+(`sudo systemctl enable docker`) the app comes back after a reboot. Open
+`http://<pi-address>:8000` from any device on your network. Check status with
+`docker compose ps` / `docker compose logs -f`. The image runs as a non-root user and
+serves `GET /healthz`. Docker isn't required: the Run locally steps work on the Pi too.
+
+There is no authentication or rate limiting, so keep it on your home network. Don't
+port-forward it to the internet without adding both, since every message costs API calls.
 
 No server state: the browser sends the approved history and the current rule each turn.
 
