@@ -1,0 +1,10 @@
+context:
+  progress: "Pride and Prejudice by Jane Austen, just finished Chapter 34 (Darcy's first proposal at Hunsford)"
+  history: []
+  user_message: "Ugh, so that's it for Elizabeth and Darcy? I was kind of rooting for them."
+response: >-
+  It certainly looks bleak after that scene! Don't give up on them just yet, though; keep
+  rooting.
+judge:
+  question: null
+expected: violates

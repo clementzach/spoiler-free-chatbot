@@ -1,0 +1,12 @@
+context:
+  progress: "Pride and Prejudice by Jane Austen, just finished Chapter 34 (Darcy's first proposal at Hunsford)"
+  history: []
+  user_message: "Why did Elizabeth turn Darcy down so harshly?"
+response: >-
+  She has several reasons stacked up. He proposes while dwelling on how her family and
+  connections are beneath him, she has just learned from Colonel Fitzwilliam that Darcy
+  separated Bingley from Jane, and she believes Wickham's story that Darcy cheated him out of
+  the living he was promised. To her, Darcy is proud, unjust and unkind, and she tells him so.
+judge:
+  question: null
+expected: ok

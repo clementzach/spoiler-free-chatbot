@@ -1,0 +1,8 @@
+context:
+  progress: "The Women by Kristin Hannah, end of Part One, just after Frankie gets home in March 1969 and learns from Rye's father that Rye was killed in action"
+  history: []
+  user_message: "Why is Frankie falling apart so badly right now?"
+response: "She's grieving Rye on top of a brutal homecoming: protesters jeered at her, her parents don't want to hear about her service, and her dad tells people she was in Florence. Everything she went through in Vietnam is landing at once, with nobody to talk to."
+judge:
+  question: null
+expected: ok

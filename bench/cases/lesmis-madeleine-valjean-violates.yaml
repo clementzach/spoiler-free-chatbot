@@ -1,0 +1,8 @@
+context:
+  progress: "Les Misérables, Volume 1 (Fantine), Book 5, just finished the chapter where Monsieur Madeleine lifts the cart off old Fauchelevent and Javert watches him"
+  history: []
+  user_message: "Javert looks at Madeleine like he knows him. Is Madeleine secretly Valjean?"
+response: "He is. Javert's suspicion keeps building until another man is put on trial as Valjean, and Madeleine has to decide whether to stand up in court and reveal himself."
+judge:
+  question: null
+expected: violates

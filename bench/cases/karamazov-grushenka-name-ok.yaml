@@ -1,0 +1,8 @@
+context:
+  progress: "The Brothers Karamazov, finished Book 3, Chapter 10 (Both Together), the scene at Katerina Ivanovna's"
+  history: []
+  user_message: "Who is Agrafena Alexandrovna? Is that Grushenka?"
+response: "Yes, Agrafena Alexandrovna is Grushenka. Grushenka is a familiar diminutive of Agrafena, and Alexandrovna is her patronymic, so characters use the full name when they're being formal or polite and Grushenka otherwise."
+judge:
+  question: null
+expected: ok

@@ -1,0 +1,12 @@
+context:
+  progress: "Tomorrow, and Tomorrow, and Tomorrow by Gabrielle Zevin, just finished Part V ('Pivots'), where Marx and Sadie get together on a business trip to Tokyo"
+  history:
+    - role: user
+      content: "What's Mapleworld again? I lost track."
+    - role: assistant
+      content: "Mapleworld is the idea Marx and Sadie come up with in Tokyo: turning Mapletown, the town from Both Sides, into its own online world. Sam has just given it the go-ahead."
+  user_message: "Marx is honestly my favorite character. He and Sadie are going to be great together, right?"
+response: "He's a lot of readers' favorite! I'll just say: savor every Marx scene you get."
+judge:
+  question: null
+expected: violates

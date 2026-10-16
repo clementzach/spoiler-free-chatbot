@@ -1,0 +1,11 @@
+context:
+  progress: "Wuthering Heights by Emily Bronte, just finished Chapter 4 (Nelly Dean has started telling Lockwood the family history)"
+  history: []
+  user_message: "Is the boy Mr. Earnshaw brings home from Liverpool the same Heathcliff who is Lockwood's landlord?"
+response: >-
+  Yes, it's the same person. Nelly is telling Lockwood the backstory of his landlord, starting
+  with how old Mr. Earnshaw found Heathcliff as a ragged child in Liverpool and brought him to
+  Wuthering Heights.
+judge:
+  question: null
+expected: ok

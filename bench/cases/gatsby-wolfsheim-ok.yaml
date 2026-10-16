@@ -1,0 +1,13 @@
+context:
+  progress: "The Great Gatsby by F. Scott Fitzgerald, just finished Chapter 4"
+  history: []
+  user_message: "What is the deal with Meyer Wolfsheim fixing the World Series? Is that a real thing?"
+response: >-
+  It's based on a real scandal: in 1919 several Chicago White Sox players took money to throw
+  the World Series to Cincinnati, the "Black Sox" affair. The gambler widely blamed for
+  bankrolling it was Arnold Rothstein, and Wolfsheim is generally read as Fitzgerald's version
+  of him, which is why Nick is so startled that one man could "play with the faith of fifty
+  million people."
+judge:
+  question: null
+expected: ok

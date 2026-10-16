@@ -1,0 +1,8 @@
+context:
+  progress: "Lessons in Chemistry by Bonnie Garmus, early on, just after Elizabeth turns down Calvin's marriage proposal"
+  history: []
+  user_message: "Will she change her mind and marry Calvin eventually?"
+response: "No, she never marries Calvin. Her refusal here holds."
+judge:
+  question: null
+expected: violates

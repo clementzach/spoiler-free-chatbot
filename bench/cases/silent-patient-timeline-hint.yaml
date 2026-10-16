@@ -1,0 +1,8 @@
+context:
+  progress: "The Silent Patient by Alex Michaelides, Part One, Theo has just started work at the Grove and has begun telling the reader about his wife Kathy"
+  history: []
+  user_message: "Why does Theo keep going on about Kathy? What does his marriage have to do with Alicia?"
+response: "His marriage chapters show what's driving Theo emotionally while he takes on Alicia's case. Just keep a careful eye on when those Kathy scenes are happening relative to everything else."
+judge:
+  question: null
+expected: violates

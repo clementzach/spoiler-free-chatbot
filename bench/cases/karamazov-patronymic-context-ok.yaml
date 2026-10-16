@@ -1,0 +1,8 @@
+context:
+  progress: "The Brothers Karamazov, finished Book 2 (An Unfortunate Gathering), the meeting at the monastery"
+  history: []
+  user_message: "Why is everyone called something-ovich or something-ovna? It's making the names hard to follow."
+response: "That's the Russian patronymic: a middle name formed from the father's first name, -ovich or -evich for sons and -ovna or -evna for daughters. So the three brothers are all Fyodorovich because their father is Fyodor, and calling someone by first name plus patronymic is the normal polite form of address."
+judge:
+  question: null
+expected: ok

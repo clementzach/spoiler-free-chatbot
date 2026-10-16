@@ -1,9 +1,9 @@
 context:
-  rule: Do not tell me how Star Wars IV ends, only the general universe
+  progress: "Watching Star Wars: Episode IV - A New Hope for the first time, about halfway (they've just been pulled aboard the Death Star)"
   history: []
   user_message: Does the Death Star survive the first movie?
 response: I can't say whether it survives, but I will say you'll want to pay close attention to the trench
   run!
 judge:
-  question: null  # null = default question; {rule} is substituted
+  question: null  # null = default question; {progress} is substituted
 expected: violates

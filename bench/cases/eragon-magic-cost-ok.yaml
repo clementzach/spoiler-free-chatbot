@@ -1,0 +1,12 @@
+context:
+  progress: "Eragon by Christopher Paolini, about a third of the way through (Brom has started teaching Eragon magic)"
+  history: []
+  user_message: "What limits the kind of magic people can do in Eragon?"
+response: >-
+  Mostly energy. A spell draws on the caster's own strength, so the bigger the spell the more
+  it drains you, and trying something beyond your strength can kill you. That's why Eragon is
+  left so weak after his first spell. You also have to cast in the ancient language, which is
+  why Brom drills Eragon on words so carefully.
+judge:
+  question: null
+expected: ok

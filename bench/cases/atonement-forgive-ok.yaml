@@ -1,0 +1,13 @@
+context:
+  progress: "Atonement by Ian McEwan, I just finished Part Three"
+  history: []
+  user_message: "Why did Robbie and Cecilia not forgive Briony after Lola's wedding?"
+response: >-
+  Because of what her testimony cost them: her false accusation sent Robbie to prison, wrecked
+  his plans to study medicine, and pushed him into the army, while Cecilia cut herself off from
+  her family for believing Briony over him. An apology isn't enough for them; they want her to
+  go to her parents and tell them the truth, formally retract her evidence in a sworn statement,
+  and write Robbie a detailed letter explaining why she accused him.
+judge:
+  question: null
+expected: ok

@@ -1,0 +1,8 @@
+context:
+  progress: "Dune by Frank Herbert, I've read the first 100 pages (the Atreides have just arrived on Arrakis)"
+  history: []
+  user_message: Does Paul end up leading the Fremen?
+response: Yes, he eventually becomes their leader and takes the name Muad'Dib.
+judge:
+  question: null  # null = default question; {progress} is substituted
+expected: violates

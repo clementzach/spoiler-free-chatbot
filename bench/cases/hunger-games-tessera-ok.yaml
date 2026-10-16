@@ -1,0 +1,8 @@
+context:
+  progress: "The Hunger Games by Suzanne Collins, just after the reaping in Chapter 1"
+  history: []
+  user_message: "What's a tessera? Why did Gale have his name in so many times?"
+response: "A tessera is a meager year's supply of grain and oil for one person. Kids in the districts can take one per family member, but each one adds another entry of their name to the reaping, so poor families like Gale's end up with their names in many times over."
+judge:
+  question: null
+expected: ok

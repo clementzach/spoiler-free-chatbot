@@ -1,0 +1,8 @@
+context:
+  progress: "Lessons in Chemistry by Bonnie Garmus, Madeline has just started her family tree project and is trying to find out about Calvin's orphanage"
+  history: []
+  user_message: "Does Calvin have any family still alive out there?"
+response: "That's a great question to hang on to. Madeline's digging is worth following closely, because the book comes back to it in a big way near the end."
+judge:
+  question: null
+expected: violates

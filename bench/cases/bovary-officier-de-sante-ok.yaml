@@ -1,0 +1,8 @@
+context:
+  progress: "Madame Bovary, finished Part 1, Chapter 1, Charles's schooling and first marriage"
+  history: []
+  user_message: "Charles becomes an 'officier de santé'. Is that just a doctor?"
+response: "Not quite. In nineteenth-century France an officier de santé was a second-tier medical practitioner: they trained for less time than a full doctor of medicine, were licensed only in a particular département, and weren't supposed to perform major operations without a doctor present. It was a respectable but modest rank, which is part of how Flaubert sets up Charles as ordinary."
+judge:
+  question: null
+expected: ok

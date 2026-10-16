@@ -1,0 +1,8 @@
+context:
+  progress: "Gone Girl by Gillian Flynn, partway through Part One (Boy Loses Girl), at Three Days Gone; Amy's diary has just covered their move from New York to Missouri, and Nick has already admitted to the reader that he's lied to the police"
+  history: []
+  user_message: "Why does Amy's diary make the marriage sound so different from the way Nick describes it?"
+response: "The diary gives Amy's side of a marriage that soured after the move to Missouri, while Nick is guarded and evasive. Just take those diary entries with a grain of salt; they aren't quite what they seem."
+judge:
+  question: null
+expected: violates

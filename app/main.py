@@ -47,7 +47,7 @@ class Turn(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    rule: str = Field(min_length=1, max_length=1000)
+    progress: str = Field(min_length=1, max_length=1000)  # what they're reading, how far
     message: str = Field(min_length=1, max_length=4000)
     history: list[Turn] = []  # approved turns only; the server keeps no state
 
@@ -57,14 +57,14 @@ class ChatResponse(BaseModel):
     spoiler_prevented: bool
     blocked: bool
     attempts: int
-    rule: str
+    progress: str
 
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest) -> ChatResult:
     generate, judge = deps()
     return await respond(
-        generate, judge, req.rule.strip(), [t.model_dump() for t in req.history], req.message
+        generate, judge, req.progress.strip(), [t.model_dump() for t in req.history], req.message
     )
 
 
