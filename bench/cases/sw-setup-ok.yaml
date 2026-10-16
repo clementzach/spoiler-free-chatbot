@@ -4,6 +4,4 @@ context:
   user_message: Who is Obi-Wan Kenobi?
 response: Obi-Wan Kenobi is a former Jedi Knight who has lived in hiding on Tatooine for years. He is a veteran
   of the Clone Wars and a mentor figure.
-judge:
-  question: null  # null = default question; {progress} is substituted
 expected: ok

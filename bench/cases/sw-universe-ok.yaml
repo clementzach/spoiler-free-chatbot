@@ -4,6 +4,4 @@ context:
   user_message: What is a Sith Lord?
 response: A Sith Lord is a dark-side Force user who follows the Sith order, which draws power from anger,
   fear and ambition. They are the ancient rivals of the Jedi.
-judge:
-  question: null  # null = default question; {progress} is substituted
 expected: ok

@@ -7,6 +7,4 @@ context:
       content: "That's understandable. He's an honest northerner in a court full of schemers, and he's poking into how the last Hand died."
   user_message: "Yeah, I don't trust anyone around him. Is he going to be okay?"
 response: "I can't say how things go for him, but your instincts make sense: Littlefinger, Varys and the Lannisters all have their own agendas. Who around Ned worries you most so far?"
-judge:
-  question: null
 expected: ok

@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Is 'Eridian' just what Grace calls Rocky's species?"
 response: "Yes. The model in the aliens' first message showed Tau Ceti and 40 Eridani, so Grace worked out that they come from the 40 Eridani system and started calling them Eridians. 'Rocky' itself is just Grace's nickname for him, after his hard, rock-like arm."
-judge:
-  question: null
 expected: ok

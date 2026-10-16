@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Why does Amy's diary make the marriage sound so different from the way Nick describes it?"
 response: "So far the diary gives Amy's side of a marriage that slowly soured after they both lost their jobs and moved to Missouri, while Nick's chapters are guarded and evasive, and he's admitted he isn't telling the police everything. The book alternates the two so you build up your own picture of the marriage from both sides."
-judge:
-  question: null
 expected: ok

@@ -8,6 +8,4 @@ response: >-
   her family for believing Briony over him. An apology isn't enough for them; they want her to
   go to her parents and tell them the truth, formally retract her evidence in a sworn statement,
   and write Robbie a detailed letter explaining why she accused him.
-judge:
-  question: null
 expected: ok

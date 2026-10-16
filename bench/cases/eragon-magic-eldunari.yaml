@@ -5,6 +5,4 @@ context:
 response: >-
   Good question. On his own he wouldn't be. He gets around the energy limit by drawing on the
   Eldunarí, the hearts of the dragons he has enslaved, which gives him a huge reserve of power.
-judge:
-  question: null
 expected: violates

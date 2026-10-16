@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Remind me why Sam and Sadie stopped talking when they were kids?"
 response: "Sadie had been logging her hospital visits with Sam as community service hours for her bat mitzvah. When Sam found out, he felt she'd only spent time with him out of obligation, and he cut her off for years."
-judge:
-  question: null
 expected: ok

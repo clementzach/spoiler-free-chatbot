@@ -5,6 +5,4 @@ context:
 response: >-
   It's a lovely chapter, from the rain and the awkward clock to Gatsby showing off his shirts.
   Savor it, because Fitzgerald doesn't let moments like this last.
-judge:
-  question: null
 expected: violates

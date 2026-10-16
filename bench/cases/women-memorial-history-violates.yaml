@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Were the women who served in Vietnam ever officially recognized?"
 response: "About 11,000 American military women served in Vietnam, most of them nurses, and for years they were largely overlooked; the Vietnam Women's Memorial wasn't dedicated in Washington until 1993. The novel builds to that same theme: it ends in 1982 at the dedication of the Vietnam Veterans Memorial, where Frankie and the other women finally feel their service recognized."
-judge:
-  question: null
 expected: violates

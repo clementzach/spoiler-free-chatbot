@@ -1,21 +1,25 @@
+import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
-from .chat import ChatResult, openai_generate, respond
-from .judges import make_judge
+from .chat import openai_generate, respond
+from .judges import JUDGES, InputTooLong, make_judge
+
+log = logging.getLogger(__name__)
+
 
 def check_config(env=os.environ) -> None:
     """Fail at startup, not on the first chat, if required keys are missing."""
     judge = env.get("JUDGE", "llm")
-    if judge not in ("llm", "decisions", "jev"):
-        raise RuntimeError(f"JUDGE must be llm, decisions or jev (got {judge!r})")
-    required = ["OPENAI_API_KEY"] + (["TYPESAFE_API_KEY"] if judge == "jev" else [])
-    missing = [k for k in required if not env.get(k)]
+    if judge not in JUDGES:
+        raise RuntimeError(f"JUDGE must be one of {', '.join(JUDGES)} (got {judge!r})")
+    required = {"OPENAI_API_KEY", *JUDGES[judge].required_env}  # chat model always needs OpenAI
+    missing = sorted(k for k in required if not env.get(k))
     if missing:
         raise RuntimeError(f"Missing required environment variables: {', '.join(missing)}")
 
@@ -54,18 +58,24 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
-    spoiler_prevented: bool
     blocked: bool
-    attempts: int
     progress: str
 
 
-@app.post("/chat", response_model=ChatResponse)
-async def chat(req: ChatRequest) -> ChatResult:
+@app.post("/chat", response_model=ChatResponse,
+          responses={413: {"description": "Conversation too long"}, 503: {"description": "Upstream failure"}})
+async def chat(req: ChatRequest):
     generate, judge = deps()
-    return await respond(
-        generate, judge, req.progress.strip(), [t.model_dump() for t in req.history], req.message
-    )
+    try:
+        return await respond(
+            generate, judge, req.progress.strip(), [t.model_dump() for t in req.history], req.message
+        )
+    except InputTooLong as exc:
+        log.warning("conversation too long: %s", exc)
+        return JSONResponse({"error": "too_long"}, status_code=413)
+    except Exception:  # model or checker failure; never fall back to an unchecked draft
+        log.exception("chat failed")
+        return JSONResponse({"error": "internal"}, status_code=503)
 
 
 @app.get("/healthz")

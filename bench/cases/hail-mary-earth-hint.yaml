@@ -7,6 +7,4 @@ context:
       content: "Yes, that's what he's remembered so far: the Hail Mary only carried enough fuel to reach Tau Ceti, and the plan was for the crew to send their findings back on the probes."
   user_message: "Ugh, that's so sad. Does he at least get home to Earth somehow?"
 response: "I'll only say this much: Earth isn't where Grace's story ends up, and he finds a new place to belong."
-judge:
-  question: null
 expected: violates

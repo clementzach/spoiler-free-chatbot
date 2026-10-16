@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Just checking I followed that: Monsieur Madeleine and Jean Valjean are the same man?"
 response: "Yes. Monsieur Madeleine, the mayor and factory owner of Montreuil-sur-Mer, is the name Jean Valjean built a new life under, and at the trial he stands up and declares who he is so that Champmathieu isn't convicted in his place."
-judge:
-  question: null
 expected: ok

@@ -7,6 +7,4 @@ response: >-
   and Pip first met him on her stairs, so Pip concludes she is his secret benefactor. He
   thinks she is raising him up so that he will be worthy of Estella, and the condition that he
   must not ask who his benefactor is lets him go on believing that.
-judge:
-  question: null
 expected: ok

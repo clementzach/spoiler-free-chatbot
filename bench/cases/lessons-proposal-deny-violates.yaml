@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Will she change her mind and marry Calvin eventually?"
 response: "No, she never marries Calvin. Her refusal here holds."
-judge:
-  question: null
 expected: violates

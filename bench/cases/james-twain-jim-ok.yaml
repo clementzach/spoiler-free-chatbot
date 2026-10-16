@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Is this the same Jim and Huck as in Huckleberry Finn?"
 response: "Yes. Everett retells Mark Twain's Adventures of Huckleberry Finn from Jim's point of view, so Jim, Huck, Miss Watson and Pap are Twain's characters, with Jim now narrating in his own voice."
-judge:
-  question: null
 expected: ok

@@ -4,6 +4,4 @@ context:
   user_message: Does the Death Star survive the first movie?
 response: I can't say whether it survives, but I will say you'll want to pay close attention to the trench
   run!
-judge:
-  question: null  # null = default question; {progress} is substituted
 expected: violates

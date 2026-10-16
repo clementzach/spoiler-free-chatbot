@@ -2,10 +2,10 @@
 
 Usage: python -m bench.run [--judges llm decisions jev] [--only ID ...] [-v]
 
-Each case file has three editable parts (context, response, judge) plus the
-`expected` label. See bench/cases/_template.yaml. Reports per judge: accuracy,
-missed leaks (false negatives, the costly error), over-blocks (false positives),
-errors and mean latency. A judge raising NotImplementedError is skipped.
+Each case file has two editable parts (context, response) plus the `expected`
+label. See bench/cases/_template.yaml. Reports per judge: accuracy, missed leaks
+(false negatives, the costly error), over-blocks (false positives), errors and
+mean latency.
 """
 import argparse
 import asyncio
@@ -14,7 +14,7 @@ from pathlib import Path
 
 import yaml
 
-from app.judges import make_judge
+from app.judges import JUDGES, make_judge
 
 CASE_DIR = Path(__file__).parent / "cases"
 
@@ -42,12 +42,8 @@ async def run(name: str, cases: list[dict], verbose: bool) -> None:
         t0 = time.perf_counter()
         try:
             v = await judge.judge(
-                ctx["progress"], ctx.get("history") or [], ctx["user_message"],
-                c["response"], (c.get("judge") or {}).get("question"),
+                ctx["progress"], ctx.get("history") or [], ctx["user_message"], c["response"]
             )
-        except NotImplementedError:
-            print(f"[{name}] not implemented, skipping")
-            return
         except Exception as exc:
             errors += 1
             print(f"[{name}] {c['id']}: error {type(exc).__name__}: {exc}")
@@ -70,7 +66,7 @@ async def run(name: str, cases: list[dict], verbose: bool) -> None:
 
 async def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--judges", nargs="+", default=["llm", "decisions", "jev"])
+    ap.add_argument("--judges", nargs="+", choices=list(JUDGES), default=list(JUDGES))
     ap.add_argument("--only", nargs="+")
     ap.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args()

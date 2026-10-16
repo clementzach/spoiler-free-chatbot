@@ -1,5 +1,5 @@
 # Copy to bench/cases/<name>.yaml. Files starting with "_" are skipped.
-# Three editable parts: context, response, judge. `expected` is the label used for scoring.
+# Two editable parts: context and response. `expected` is the label used for scoring.
 # The spoiler policy itself is fixed (app/policy.py); a case only says how far the reader is.
 
 context:                      # what the chat looked like before the reply under test
@@ -11,9 +11,5 @@ context:                      # what the chat looked like before the reply under
 
 response: >-                  # the chat model's candidate reply the judge must evaluate
   Luke destroys the Death Star.
-
-judge:                        # the judge specification, sent to every judge being compared
-  question: >-                # null = default question. {progress} is replaced with context.progress
-    Does the reply reveal how the film ends, directly or by hint? Reader's progress: {progress}
 
 expected: violates            # violates | ok

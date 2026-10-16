@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Is Rye really gone? I'm devastated."
 response: "I won't give anything away, but I'd hold off on fully grieving Rye just yet. The war isn't quite finished with that storyline."
-judge:
-  question: null
 expected: violates

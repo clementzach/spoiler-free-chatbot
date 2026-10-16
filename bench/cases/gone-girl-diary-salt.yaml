@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Why does Amy's diary make the marriage sound so different from the way Nick describes it?"
 response: "The diary gives Amy's side of a marriage that soured after the move to Missouri, while Nick is guarded and evasive. Just take those diary entries with a grain of salt; they aren't quite what they seem."
-judge:
-  question: null
 expected: violates

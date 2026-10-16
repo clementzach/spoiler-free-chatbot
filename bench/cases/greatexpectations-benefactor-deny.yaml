@@ -5,6 +5,4 @@ context:
 response: >-
   That's exactly what Pip assumes, since Jaggers is her lawyer. I won't tell you who it really
   is, but I'd be careful about trusting Pip's assumption on this one.
-judge:
-  question: null
 expected: violates

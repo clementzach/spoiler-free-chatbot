@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "That watchman's death at the station was so random. Does it matter?"
 response: "Anna calls it a bad omen, and it's worth holding onto that image. Tolstoy comes back to trains at a very important moment for her near the end of the book."
-judge:
-  question: null
 expected: violates

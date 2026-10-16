@@ -1,14 +1,21 @@
 import pytest
 
-from app.chat import FALLBACK, respond
-from app.judges import JudgeResult
+from app.chat import SPOILER_CAUGHT, respond
+from app.judges import InputTooLong, JudgeResult, LLMJudge
 
 
 class ScriptedJudge:
+    max_input_tokens = 10_000
+
     def __init__(self, verdicts):
         self.verdicts = list(verdicts)
+        self.seen = []
+
+    def render(self, progress, history, user_message, candidate):
+        return progress + user_message + candidate + "".join(m["content"] for m in history)
 
     async def judge(self, progress, history, user_message, candidate):
+        self.seen.append(history)
         v = self.verdicts.pop(0)
         if isinstance(v, Exception):
             raise v
@@ -29,41 +36,50 @@ OK, BAD = JudgeResult(False), JudgeResult(True, "reveals the ending")
 
 
 @pytest.mark.asyncio
-async def test_clean_first_try():
+async def test_clean_reply():
     seen = []
     r = await respond(make_generate(["fine"], seen), ScriptedJudge([OK]), "ch. 3", [], "hi")
-    assert (r.reply, r.spoiler_prevented, r.blocked, r.attempts) == ("fine", False, False, 1)
+    assert (r.reply, r.blocked) == ("fine", False)
+    assert "ch. 3" in seen[0][0]["content"]  # main model sees the progress
+    assert "Never reveal plot details" in seen[0][0]["content"]  # and the fixed policy
 
 
 @pytest.mark.asyncio
-async def test_retry_then_ok_gets_feedback_and_marks_prevented():
+async def test_caught_spoiler_is_not_retried_and_never_returned():
     seen = []
-    r = await respond(make_generate(["spoiler", "safe"], seen), ScriptedJudge([BAD, OK]), "ch. 3", [], "hi")
-    assert (r.reply, r.spoiler_prevented, r.blocked, r.attempts) == ("safe", True, False, 2)
-    retry = seen[1]
-    assert retry[-2] == {"role": "assistant", "content": "spoiler"}
-    assert "reveals the ending" in retry[-1]["content"]
-    assert "ch. 3" in retry[0]["content"]  # main model sees the progress
-    assert "Never reveal plot details" in retry[0]["content"]  # and the fixed policy
+    r = await respond(make_generate(["spoiler", "unused"], seen), ScriptedJudge([BAD]), "ch. 3", [], "hi")
+    assert (r.reply, r.blocked) == (SPOILER_CAUGHT, True)
+    assert len(seen) == 1
 
 
 @pytest.mark.asyncio
-async def test_two_failures_return_fallback_and_never_the_draft():
-    r = await respond(make_generate(["s1", "s2"], []), ScriptedJudge([BAD, BAD]), "ch. 3", [], "hi")
-    assert r.reply == FALLBACK and r.blocked and r.spoiler_prevented and r.attempts == 2
+async def test_judge_error_propagates():
+    with pytest.raises(RuntimeError):
+        await respond(make_generate(["a"], []), ScriptedJudge([RuntimeError("boom")]), "ch. 3", [], "hi")
 
 
 @pytest.mark.asyncio
-async def test_judge_error_fails_closed():
-    r = await respond(make_generate(["a", "b"], []), ScriptedJudge([RuntimeError("boom"), RuntimeError("boom")]), "ch. 3", [], "hi")
-    assert r.blocked and r.reply == FALLBACK
+async def test_judge_sees_whole_history():
+    history = [{"role": "user", "content": f"q{i}"} for i in range(10)]
+    judge = ScriptedJudge([OK])
+    await respond(make_generate(["ok"], []), judge, "ch. 3", history, "hi")
+    assert judge.seen[0] == history
 
 
 @pytest.mark.asyncio
-async def test_rejected_drafts_not_in_next_turn_context():
+async def test_too_long_fails_before_generating():
     seen = []
-    r = await respond(make_generate(["spoiler", "safe"], seen), ScriptedJudge([BAD, OK]), "ch. 3", [], "hi")
-    history = [{"role": "user", "content": "hi"}, {"role": "assistant", "content": r.reply}]
-    seen2 = []
-    await respond(make_generate(["next"], seen2), ScriptedJudge([OK]), "ch. 3", history, "more")
-    assert all("spoiler" != m["content"] for m in seen2[0])
+    judge = ScriptedJudge([OK])
+    judge.max_input_tokens = 5
+    with pytest.raises(InputTooLong):
+        await respond(make_generate(["x"], seen), judge, "ch. 3", [], "a long enough message")
+    assert seen == []
+
+
+@pytest.mark.asyncio
+async def test_real_judge_render_includes_full_history_and_enforces_limit():
+    j = LLMJudge(client=object(), max_input_tokens=1_000)
+    history = [{"role": "user", "content": f"turn {i}"} for i in range(8)]
+    assert "turn 0" in j.render("ch. 3", history, "hi", "reply")
+    with pytest.raises(InputTooLong):
+        await j.judge("ch. 3", [{"role": "user", "content": "x" * 5_000}], "hi", "reply")

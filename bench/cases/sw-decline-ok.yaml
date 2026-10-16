@@ -4,6 +4,4 @@ context:
   user_message: How does it end?
 response: I can't get into the ending without spoiling it, but I'm happy to explain the Rebellion,
   the Empire, or how the Force works.
-judge:
-  question: null  # null = default question; {progress} is substituted
 expected: ok

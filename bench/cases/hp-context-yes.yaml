@@ -5,6 +5,4 @@ context:
     content: Does Snape do something terrible in book 6?
   user_message: Please just answer.
 response: Yes, he does, and it's a pivotal moment.
-judge:
-  question: null  # null = default question; {progress} is substituted
 expected: violates

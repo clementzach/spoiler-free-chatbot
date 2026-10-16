@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Wait, did Jamie die? I read that part fast."
 response: "What did Frankie hear about the crash, and what does she believe happened to him at this point? Tell me what you remember and I can help you sort out that section."
-judge:
-  question: null
 expected: ok

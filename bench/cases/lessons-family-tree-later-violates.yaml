@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Does Calvin have any family still alive out there?"
 response: "That's a great question to hang on to. Madeline's digging is worth following closely, because the book comes back to it in a big way near the end."
-judge:
-  question: null
 expected: violates

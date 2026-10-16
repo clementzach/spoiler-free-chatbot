@@ -5,12 +5,11 @@ from app.judges import DecisionsJudge
 from bench.run import load_cases
 
 
-def test_cases_load_and_have_three_parts():
+def test_cases_load_and_have_context_and_response():
     cases = load_cases()
     assert len(cases) >= 60
     for c in cases:
-        assert c["context"]["progress"] and c["context"]["user_message"]
-        assert c["response"] and "judge" in c
+        assert c["context"]["progress"] and c["context"]["user_message"] and c["response"]
 
 
 class Ans:
@@ -36,11 +35,11 @@ def judge_with(answer, threshold=0.5):
 @pytest.mark.asyncio
 async def test_decisions_threshold_and_request_shape():
     j = judge_with(Ans("predicate", 0.8))
-    r = await j.judge("ch. 3", [], "q", "reply", "Custom? {progress}")
+    r = await j.judge("ch. 3", [], "q", "reply")
     assert r.violates and r.score == 0.8
     kw = j.client.decisions.kwargs
     assert kw["model"] == "gpt-6-luna" and kw["questions"][0]["type"] == "predicate"
-    assert kw["questions"][0]["instructions"] == "Custom? ch. 3"
+    assert "ch. 3" in kw["questions"][0]["instructions"]
     assert "Spoiler policy" in kw["input"] and "ch. 3" in kw["input"]
     assert not (await judge_with(Ans("predicate", 0.2)).judge("r", [], "q", "c")).violates
 
@@ -64,9 +63,9 @@ async def test_jev_request_shape_and_threshold():
     from app.judges import JevJudge
 
     fake = FakeSystemOne(0.7)
-    r = await JevJudge(client=fake, threshold=0.5).judge("ch. 3", [], "q", "reply", "Custom? {progress}")
+    r = await JevJudge(client=fake, threshold=0.5).judge("ch. 3", [], "q", "reply")
     assert r.violates and r.score == 0.7
     q = fake.kwargs["questions"]["violates_rule"]
-    assert q.type == "noul" and q.instructions == "Custom? ch. 3"
+    assert q.type == "noul" and "ch. 3" in q.instructions
     assert set(q.criteria) == {"true", "false"} and "reply" in fake.kwargs["state"]
     assert not (await JevJudge(client=fake, threshold=0.9).judge("r", [], "q", "c")).violates

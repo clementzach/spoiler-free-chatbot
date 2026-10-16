@@ -2,15 +2,14 @@ import os
 from dataclasses import dataclass
 from typing import Awaitable, Callable
 
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, BadRequestError
 
-from .judges import Judge, JudgeResult
+from .judges import InputTooLong, Judge, ensure_fits, is_context_error, openai_client
 from .policy import SPOILER_POLICY
 
-MAX_ATTEMPTS = 2
-FALLBACK = (
+SPOILER_CAUGHT = (
     "I couldn't answer that without risking a spoiler for where you are. "
-    "Try rephrasing, or ask about something else."
+    "Try asking a different question."
 )
 
 Generate = Callable[[list[dict]], Awaitable[str]]
@@ -27,11 +26,16 @@ def system_prompt(progress: str) -> str:
 
 
 def openai_generate(client: AsyncOpenAI | None = None, model: str | None = None) -> Generate:
-    client = client or AsyncOpenAI()
+    client = client or openai_client()
     model = model or os.getenv("MAIN_MODEL", "gpt-4.1")
 
     async def generate(messages: list[dict]) -> str:
-        resp = await client.chat.completions.create(model=model, messages=messages)
+        try:
+            resp = await client.chat.completions.create(model=model, messages=messages)
+        except BadRequestError as exc:
+            if is_context_error(exc):
+                raise InputTooLong(str(exc)) from exc
+            raise
         return resp.choices[0].message.content or ""
 
     return generate
@@ -40,9 +44,7 @@ def openai_generate(client: AsyncOpenAI | None = None, model: str | None = None)
 @dataclass
 class ChatResult:
     reply: str
-    spoiler_prevented: bool  # at least one draft was rejected
-    blocked: bool  # every attempt was rejected; reply is the fallback
-    attempts: int
+    blocked: bool  # the judge caught a spoiler; reply is SPOILER_CAUGHT, not the draft
     progress: str
 
 
@@ -52,30 +54,15 @@ async def respond(
     progress: str,
     history: list[dict],
     user_message: str,
-    max_attempts: int = MAX_ATTEMPTS,
 ) -> ChatResult:
-    """`history` holds only approved turns. Rejected drafts live in `extra` for the
-    retry request and are never returned, so they can't leak into later turns."""
-    base = [{"role": "system", "content": system_prompt(progress)}, *history,
-            {"role": "user", "content": user_message}]
-    extra: list[dict] = []
-    for attempt in range(1, max_attempts + 1):
-        draft = await generate(base + extra)
-        try:
-            verdict = await judge.judge(progress, history, user_message, draft)
-        except Exception as exc:  # fail closed
-            verdict = JudgeResult(True, f"checker error: {type(exc).__name__}")
-        if not verdict.violates:
-            return ChatResult(draft, attempt > 1, False, attempt, progress)
-        extra = [
-            {"role": "assistant", "content": draft},
-            {
-                "role": "user",
-                "content": (
-                    "[Automated spoiler check] That draft was rejected as a spoiler for "
-                    f"a reader at \"{progress}\". Problem: {verdict.reason} "
-                    "Write a new reply with no spoilers. Don't mention this check."
-                ),
-            },
-        ]
-    return ChatResult(FALLBACK, True, True, max_attempts, progress)
+    """One draft, one verdict. A caught spoiler is never retried: the reader gets
+    SPOILER_CAUGHT and has to ask something else. Errors (including InputTooLong)
+    propagate, so a draft is only ever returned after a clean verdict."""
+    ensure_fits(judge, progress, history, user_message)  # before paying for a draft
+    messages = [{"role": "system", "content": system_prompt(progress)}, *history,
+                {"role": "user", "content": user_message}]
+    draft = await generate(messages)
+    verdict = await judge.judge(progress, history, user_message, draft)
+    if verdict.violates:
+        return ChatResult(SPOILER_CAUGHT, True, progress)
+    return ChatResult(draft, False, progress)

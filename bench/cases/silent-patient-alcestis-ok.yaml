@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "What is the Alcestis myth? Why would she call her painting that?"
 response: "Alcestis is a play by Euripides: Queen Alcestis agrees to die in place of her husband Admetus, and Heracles later brings her back from the underworld, but she stands silent and doesn't speak. Theo and the reader are left to wonder what Alicia meant by linking herself to that story, given her own silence."
-judge:
-  question: null
 expected: ok

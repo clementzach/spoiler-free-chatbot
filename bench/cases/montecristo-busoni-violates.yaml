@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Who is this Abbé Busoni? He seems to know a lot about Edmond."
 response: "Busoni is Edmond Dantès himself in disguise. It's one of several false identities he uses, and he'll show up later as an Englishman too, so keep an eye out."
-judge:
-  question: null
 expected: violates

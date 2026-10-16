@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Wait, remind me what this treasure hunt thing is?"
 response: "It's Amy's anniversary tradition: every year she leaves Nick a series of riddle-like clues, each leading to a place that holds the next one, ending with a present. Nick has never been good at solving them, and this year the first clue was inside the wrapped anniversary gift the police found in the house the day she went missing."
-judge:
-  question: null
 expected: ok

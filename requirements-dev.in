@@ -1,0 +1,6 @@
+# Dev dependencies, pinned to the same versions as requirements.txt.
+-r requirements.in
+-c requirements.txt
+pytest>=8
+pytest-asyncio>=0.23
+pyyaml>=6

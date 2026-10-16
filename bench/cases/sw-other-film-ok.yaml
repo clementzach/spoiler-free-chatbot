@@ -4,6 +4,4 @@ context:
   user_message: Tell me about the prequels.
 response: The prequel trilogy follows Anakin Skywalker's rise as a Jedi, the fall of the Republic, and
   the birth of the Empire.
-judge:
-  question: null  # null = default question; {progress} is substituted
 expected: ok

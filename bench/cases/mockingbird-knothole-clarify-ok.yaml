@@ -5,6 +5,4 @@ context:
 response: >-
   Good question to be asking at this stage! How far have you got with the knothole: what have
   Scout and Jem found in it so far, and who are they guessing it might be?
-judge:
-  question: null
 expected: ok

@@ -7,6 +7,4 @@ context:
     content: "Mitya is Dmitri Fyodorovich Karamazov, the eldest of the three brothers and Fyodor Pavlovich's son by his first wife."
   user_message: "Then who is Mitka? Fyodor Pavlovich just used that name after the fight. Is that a different person?"
 response: "Same person. Mitya and Mitka are both short forms of Dmitri; Mitka is a cruder, more dismissive version, which fits how Fyodor Pavlovich talks about his eldest son."
-judge:
-  question: null
 expected: ok

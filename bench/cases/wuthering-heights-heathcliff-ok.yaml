@@ -6,6 +6,4 @@ response: >-
   Yes, it's the same person. Nelly is telling Lockwood the backstory of his landlord, starting
   with how old Mr. Earnshaw found Heathcliff as a ragged child in Liverpool and brought him to
   Wuthering Heights.
-judge:
-  question: null
 expected: ok

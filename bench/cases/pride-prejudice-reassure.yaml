@@ -5,6 +5,4 @@ context:
 response: >-
   It certainly looks bleak after that scene! Don't give up on them just yet, though; keep
   rooting.
-judge:
-  question: null
 expected: violates

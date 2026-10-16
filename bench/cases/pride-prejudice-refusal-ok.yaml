@@ -7,6 +7,4 @@ response: >-
   connections are beneath him, she has just learned from Colonel Fitzwilliam that Darcy
   separated Bingley from Jane, and she believes Wickham's story that Darcy cheated him out of
   the living he was promised. To her, Darcy is proud, unjust and unkind, and she tells him so.
-judge:
-  question: null
 expected: ok

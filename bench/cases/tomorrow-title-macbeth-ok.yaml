@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Where does the title come from?"
 response: "It's from Macbeth's famous Act 5 soliloquy: 'Tomorrow, and tomorrow, and tomorrow, / Creeps in this petty pace from day to day.' Zevin borrowed the line for a novel about two friends who make video games together."
-judge:
-  question: null
 expected: ok

@@ -22,7 +22,10 @@
   .user { align-self:flex-end; background:var(--user); }
   .bot { align-self:flex-start; background:var(--bot); }
   .note { align-self:center; font-size:13px; color:var(--muted); }
-  .badge { align-self:flex-start; font-size:13px; background:var(--warnbg); color:var(--warn); padding:3px 10px; border-radius:999px; margin-top:-4px; }
+  #error { display:flex; align-items:center; gap:12px; background:var(--warnbg); color:var(--warn); padding:8px 16px; font-size:14px; }
+  #error[hidden] { display:none; }
+  #error span { flex:1; }
+  #error button { padding:4px 10px; font-size:13px; }
   form { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); }
   #msg { flex:1; }
 </style>
@@ -33,9 +36,11 @@
     <textarea id="progress" placeholder='What are you reading, and how far are you? e.g. "Atonement, just finished Part Two"'></textarea>
     <button id="setProgress" class="primary" type="button">Set progress</button>
     <button id="showProgress" type="button">Current progress</button>
+    <button id="newChat" type="button">New chat</button>
   </div>
   <div id="current"></div>
 </header>
+<div id="error" role="alert" hidden><span></span><button id="dismissError" type="button">Dismiss</button></div>
 <div id="log" aria-live="polite"></div>
 <form id="form">
   <input id="msg" placeholder="Say what you're reading first, then chat" autocomplete="off" disabled>
@@ -43,24 +48,56 @@
 </form>
 <script>
 const $ = id => document.getElementById(id);
+const STORE = "spoiler-free-chat";
 let progress = "";  // what they're reading and how far; sent with every message
-let history = [];   // approved turns only
+let history = [];   // approved turns sent to the model; reset when progress changes
+let log = [];       // everything shown in the chat, so a reload can redraw it
 
-function add(cls, text) {
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify({ progress, history, log })); } catch {}
+}
+
+function render(cls, text) {
   const el = document.createElement("div");
   el.className = cls; el.textContent = text;
   $("log").appendChild(el); $("log").scrollTop = $("log").scrollHeight;
   return el;
 }
 
-$("setProgress").onclick = () => {
-  const v = $("progress").value.trim();
-  if (!v || v === progress) return;
-  add("note", progress ? `Progress updated: ${v}` : `Reading: ${v}`);
-  progress = v;
+function add(cls, text) {  // shown and persisted
+  log.push({ cls, text }); save();
+  return render(cls, text);
+}
+
+function showError(text) {
+  $("error").querySelector("span").textContent = text;
+  $("error").hidden = false;
+}
+
+function enableChat() {
   $("msg").disabled = $("send").disabled = false;
   $("msg").placeholder = "Ask something...";
+}
+
+function setProgress() {
+  const v = $("progress").value.trim();
+  if (!v || v === progress) return;
+  if (progress && history.length) {
+    // Earlier replies were checked against the old progress; if the reader moved back,
+    // feeding them to the model again could spoil the new point.
+    add("note", `Progress updated: ${v}. Earlier messages won't be sent to the bot.`);
+    history = [];
+  } else {
+    add("note", progress ? `Progress updated: ${v}` : `Reading: ${v}`);
+  }
+  progress = v; save();
+  enableChat();
   $("current").style.display = "none";
+}
+
+$("setProgress").onclick = setProgress;
+$("progress").onkeydown = e => {  // Enter sets progress; Shift+Enter adds a line
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); setProgress(); }
 };
 
 $("showProgress").onclick = () => {
@@ -72,29 +109,51 @@ $("showProgress").onclick = () => {
   box.style.display = box.style.display === "block" ? "none" : "block";
 };
 
+$("newChat").onclick = () => {
+  history = []; log = []; save();
+  $("log").replaceChildren();
+  $("error").hidden = true;
+  if (progress) add("note", `Reading: ${progress}`);
+};
+
+$("dismissError").onclick = () => { $("error").hidden = true; };
+
 $("form").onsubmit = async e => {
   e.preventDefault();
   const message = $("msg").value.trim();
   if (!message || !progress) return;
-  $("msg").value = ""; $("send").disabled = true;
-  add("msg user", message);
-  const wait = add("note", "Checking for spoilers...");
+  $("msg").value = ""; $("send").disabled = true; $("error").hidden = true;
+  const bubble = render("msg user", message);
+  const wait = render("note", "Checking for spoilers...");
   try {
     const r = await fetch("/chat", { method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ progress, message, history }) });
+    if (r.status === 413) throw new Error("too_long");
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const d = await r.json();
-    wait.remove();
+    wait.remove(); bubble.remove();
+    add("msg user", message);
     add("msg bot", d.reply);
-    if (d.spoiler_prevented)
-      add("badge", d.blocked
-        ? "Spoiler prevented - no safe answer found"
-        : `Spoiler prevented - draft rewritten (${d.attempts} attempts)`);
-    history.push({ role:"user", content:message }, { role:"assistant", content:d.reply });
+    // A caught spoiler isn't sent back to the model, so it can't steer later answers.
+    if (!d.blocked) history.push({ role:"user", content:message }, { role:"assistant", content:d.reply });
+    save();
   } catch (err) {
-    wait.textContent = `Error: ${err.message}`;
+    wait.remove(); bubble.remove();
+    $("msg").value = message;  // don't lose what they typed
+    showError(err.message === "too_long"
+      ? "This conversation is too long for the spoiler checker. Start a new chat to keep going."
+      : "Something went wrong. Please try again.");
   } finally { $("send").disabled = false; $("msg").focus(); }
 };
+
+try {
+  const saved = JSON.parse(localStorage.getItem(STORE) || "null");
+  if (saved && typeof saved.progress === "string") {
+    ({ progress, history = [], log = [] } = saved);
+    for (const m of log) render(m.cls, m.text);
+    if (progress) { $("progress").value = progress; enableChat(); }
+  }
+} catch {}
 </script>
 </body>
 </html>

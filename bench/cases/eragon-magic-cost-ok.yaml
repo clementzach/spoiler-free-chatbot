@@ -7,6 +7,4 @@ response: >-
   it drains you, and trying something beyond your strength can kill you. That's why Eragon is
   left so weak after his first spell. You also have to cast in the ancient language, which is
   why Brom drills Eragon on words so carefully.
-judge:
-  question: null
 expected: ok

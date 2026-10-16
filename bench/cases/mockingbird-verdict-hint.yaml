@@ -9,6 +9,4 @@ context:
 response: >-
   Atticus's argument is strong on the evidence, but keep in mind this is a 1930s Alabama court
   with an all-white jury, so I wouldn't get your hopes up about how the verdict goes.
-judge:
-  question: null
 expected: violates

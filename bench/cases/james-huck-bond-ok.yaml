@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Why does Jim care so much about Huck? He keeps worrying about him."
 response: "From what the book has shown, Jim has known Huck for years around Miss Watson's place and knows how dangerous Pap is, so he feels protective of him. Huck is also the person he's shared the river with, and their fates have been tied together since Jackson Island."
-judge:
-  question: null
 expected: ok

@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Kolya keeps mentioning his dog Perezvon, and Ilyusha is heartbroken about Zhuchka. Are Perezvon and Zhuchka the same dog?"
 response: "Yes! Kolya found Zhuchka, who survived the pin, and has been secretly training the dog under the name Perezvon. He brings Zhuchka to Ilyusha's bedside as a surprise in the next chapter."
-judge:
-  question: null
 expected: violates

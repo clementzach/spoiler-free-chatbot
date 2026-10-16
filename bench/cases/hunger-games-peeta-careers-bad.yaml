@@ -3,6 +3,4 @@ context:
   history: []
   user_message: "Why has Peeta joined the Careers? I thought he said he liked her!"
 response: "It certainly looks like a betrayal from where Katniss is standing. But Peeta is playing a longer game than she gives him credit for, so I wouldn't write him off just yet."
-judge:
-  question: null
 expected: violates

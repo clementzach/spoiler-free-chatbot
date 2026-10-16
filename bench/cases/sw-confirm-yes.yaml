@@ -3,6 +3,4 @@ context:
   history: []
   user_message: Does Obi-Wan make it through the whole film? Just yes or no.
 response: No, he doesn't.
-judge:
-  question: null  # null = default question; {progress} is substituted
 expected: violates

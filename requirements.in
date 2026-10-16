@@ -1,0 +1,5 @@
+# Direct dependencies. Regenerate the pinned requirements.txt with pip-compile (see README).
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+openai>=3.26,<4
+typesafe-sdk>=0.7,<1
