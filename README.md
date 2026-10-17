@@ -43,6 +43,9 @@ port-forward it to the internet without adding both, since every message costs A
 
 No server state: the browser sends the approved history and the reader's progress each turn.
 
+Live checks against the real Wikipedia API (search, intro vs full article, redirects, missing
+titles) are skipped by default so tests stay offline: `.venv/bin/pytest -m live`.
+
 ## Tool-use evals
 `bench/tool_cases/` checks how the chat model uses the Wikipedia tools. The model is live
 (needs `OPENAI_API_KEY`); Wikipedia is a per-case fixture, so results don't depend on the
