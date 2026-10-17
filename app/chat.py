@@ -33,35 +33,47 @@ def system_prompt(progress: str) -> str:
     )
 
 
-def openai_generate(client: AsyncOpenAI | None = None, model: str | None = None) -> Generate:
+ToolRunner = Callable[[str, str], Awaitable[str]]  # (tool name, JSON arguments) -> result text
+
+
+def openai_generate(
+    client: AsyncOpenAI | None = None,
+    model: str | None = None,
+    run_tool: ToolRunner | None = None,
+) -> Generate:
+    """`run_tool` defaults to live Wikipedia; benchmarks inject a stub."""
     client = client or AsyncOpenAI()
     model = model or os.getenv("MAIN_MODEL", "gpt-6-luna")
 
-    async def generate(messages: list[dict]) -> str:
-        messages = list(messages)
-        async with httpx.AsyncClient() as http:
-            for _ in range(MAX_TOOL_ROUNDS):
-                resp = await client.chat.completions.create(
-                    model=model, messages=messages, tools=wiki.TOOLS
-                )
-                msg = resp.choices[0].message
-                if not msg.tool_calls:
-                    return msg.content or ""
-                messages.append({
-                    "role": "assistant",
-                    "content": msg.content,
-                    "tool_calls": [
-                        {"id": c.id, "type": "function",
-                         "function": {"name": c.function.name, "arguments": c.function.arguments}}
-                        for c in msg.tool_calls
-                    ],
-                })
-                for c in msg.tool_calls:
-                    result = await wiki.run_tool(http, c.function.name, c.function.arguments)
-                    messages.append({"role": "tool", "tool_call_id": c.id, "content": result})
+    async def loop(messages: list[dict], run: ToolRunner) -> str:
+        for _ in range(MAX_TOOL_ROUNDS):
+            resp = await client.chat.completions.create(
+                model=model, messages=messages, tools=wiki.TOOLS
+            )
+            msg = resp.choices[0].message
+            if not msg.tool_calls:
+                return msg.content or ""
+            messages.append({
+                "role": "assistant",
+                "content": msg.content,
+                "tool_calls": [
+                    {"id": c.id, "type": "function",
+                     "function": {"name": c.function.name, "arguments": c.function.arguments}}
+                    for c in msg.tool_calls
+                ],
+            })
+            for c in msg.tool_calls:
+                result = await run(c.function.name, c.function.arguments)
+                messages.append({"role": "tool", "tool_call_id": c.id, "content": result})
         # Out of lookups: ask for an answer without tools.
         resp = await client.chat.completions.create(model=model, messages=messages)
         return resp.choices[0].message.content or ""
+
+    async def generate(messages: list[dict]) -> str:
+        if run_tool is not None:
+            return await loop(list(messages), run_tool)
+        async with httpx.AsyncClient() as http:
+            return await loop(list(messages), lambda n, a: wiki.run_tool(http, n, a))
 
     return generate
 

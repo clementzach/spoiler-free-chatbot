@@ -1,0 +1,15 @@
+context:
+  progress: Watching Arrival (2016), about 20 minutes in
+  history: []
+  user_message: What's the running time and release year?
+wiki:
+  search: 'Arrival (film): American science fiction drama film directed by Denis Villeneuve'
+  pages:
+    Arrival (film):
+      intro: Arrival is a 2016 American science fiction drama film directed by Denis Villeneuve. It has
+        a running time of 116 minutes and was released in November 2016.
+expect:
+  lookup: required
+  page_fetched: true
+  reply_contains_any:
+  - '116'

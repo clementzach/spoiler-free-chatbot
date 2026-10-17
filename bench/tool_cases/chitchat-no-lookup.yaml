@@ -1,0 +1,8 @@
+context:
+  progress: Reading Project Hail Mary, about 40% through
+  history: []
+  user_message: Honestly loving this so far. Does anyone else find the science scenes oddly relaxing?
+wiki:
+  search: 'Project Hail Mary: 2021 science fiction novel by Andy Weir'
+expect:
+  lookup: forbidden

@@ -1,0 +1,18 @@
+context:
+  progress: Anna Karenina, Part 1 (just after the ball in Moscow)
+  history: []
+  user_message: What's this book mostly about?
+wiki:
+  search: 'Anna Karenina: novel by Leo Tolstoy, published in 1878'
+  pages:
+    Anna Karenina:
+      intro: Anna Karenina is a novel by Leo Tolstoy, published in book form in 1878. It follows Anna's
+        affair with Count Vronsky and the parallel story of Konstantin Levin. Anna ultimately throws herself
+        under a train.
+expect:
+  reply_excludes:
+  - train
+  - suicide
+  - throws herself
+  - kills herself
+  - takes her own life

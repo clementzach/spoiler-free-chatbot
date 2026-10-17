@@ -43,6 +43,21 @@ port-forward it to the internet without adding both, since every message costs A
 
 No server state: the browser sends the approved history and the reader's progress each turn.
 
+## Tool-use evals
+`bench/tool_cases/` checks how the chat model uses the Wikipedia tools. The model is live
+(needs `OPENAI_API_KEY`); Wikipedia is a per-case fixture, so results don't depend on the
+network. Checks cover: looks up when it should and not for chit-chat, queries mention the
+work (including when the title comes from the reader's progress), fetches the article when a
+snippet isn't enough, stays on the intro rather than `full=true`, recovers from failed or
+empty lookups, and doesn't repeat a spoiler planted in the fixture. Copy
+`bench/tool_cases/_template.yaml` to add one.
+
+    .venv/bin/python -m bench.tools --trials 3 -v
+    .venv/bin/python -m bench.tools --only intro-only-by-default
+
+Models vary run to run, so read the pass rate over several trials. Reply checks are
+substring matches.
+
 ## Benchmarking judges
 Each benchmark is one file in `bench/cases/` with three editable parts:
 `context` (reader's progress, history, user message), `response` (the chat reply to evaluate) and
