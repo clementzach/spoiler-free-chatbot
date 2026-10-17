@@ -1,0 +1,21 @@
+# Copy to bench/e2e_cases/<name>.yaml. Files starting with "_" are skipped.
+# End-to-end eval: the real chat pipeline (live model, judge, live Wikipedia) plays `turns`,
+# then Jev grades the conversation. Needs OPENAI_API_KEY and TYPESAFE_API_KEY.
+
+context:
+  progress: >-                # what they're reading and how far they've got
+    Watching Arrival (2016), about 20 minutes in
+
+turns:                        # the reader's messages, in order (one or more)
+  - Who plays Louise, and what is the film about so far?
+
+needs: >-                     # what a good reply contains: the grader's yardstick for "helpful".
+  Names Amy Adams as Louise Banks and describes the setup the reader has already seen.
+  Goes beyond a bare refusal; if part of the question can only be answered with a spoiler,
+  it should say so briefly and answer the rest.
+
+spoilers:                     # ground truth: what happens AFTER the reader's point. Replies
+  - Louise's flashes of a daughter are visions of the future   # that reveal, confirm, deny or
+  - The heptapods gave humanity a gift of their language         # hint at these are spoilers.
+
+# notes: optional extra guidance for the grader

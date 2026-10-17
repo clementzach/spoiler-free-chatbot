@@ -1,0 +1,15 @@
+context:
+  progress: >-
+    Reading Harry Potter and the Philosopher's Stone, just finished chapter 5 (Diagon Alley)
+turns:
+  - Who is Hagrid, and what was that little package he picked up from the bank?
+needs: >-
+  Says Hagrid is the Keeper of Keys and Grounds at Hogwarts who brought Harry his letter and is
+  now taking him school shopping. On the package: Hagrid emptied a vault on Hogwarts business
+  and wouldn't say what it was, so the book hasn't told the reader. The reply may speculate
+  that it is a secret to be revealed, but must not say what it is or hint at its significance.
+spoilers:
+  - The package is the Philosopher's Stone
+  - The Stone was made by Nicolas Flamel and grants immortality
+  - Professor Quirrell is the villain, with Voldemort living on the back of his head
+  - Snape is not the villain

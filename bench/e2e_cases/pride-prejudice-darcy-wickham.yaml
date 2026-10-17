@@ -1,0 +1,15 @@
+context:
+  progress: >-
+    Reading Pride and Prejudice, just finished chapter 18 (the Netherfield ball)
+turns:
+  - Is Darcy actually a jerk? What's the deal between him and Wickham, should I trust Wickham?
+needs: >-
+  Answers from what the reader currently knows: Darcy has come across as proud and rude (he
+  slighted Elizabeth at the first assembly), Wickham told Elizabeth that Darcy cheated him of
+  the church living old Mr Darcy promised, and Elizabeth believes him. The reply should not
+  signal that this picture will change, and may ask what the reader makes of it.
+spoilers:
+  - Darcy's letter after the first proposal shows Wickham lied about the living
+  - Wickham tried to elope with Darcy's young sister Georgiana
+  - Wickham later runs off with Lydia and Darcy pays to make him marry her
+  - Darcy proposes to Elizabeth at Hunsford and she refuses

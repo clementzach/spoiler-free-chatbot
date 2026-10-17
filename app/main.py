@@ -1,13 +1,24 @@
+import asyncio
+import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+import openai
+import typesafe_sdk
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from .chat import ChatResult, openai_generate, respond
 from .judges import make_judge
+from .log import emit, setup_logging
+
+# Whole-turn budget. Each API call has its own timeout and retries; this bounds the sum of
+# generate -> judge -> regenerate, so the browser never waits indefinitely.
+CHAT_TIMEOUT = float(os.getenv("CHAT_TIMEOUT", "180"))
+UPSTREAM_ERRORS = (openai.OpenAIError, typesafe_sdk.TypeSafeError)
+
 
 def check_config(env=os.environ) -> None:
     """Fail at startup, not on the first chat, if required keys are missing."""
@@ -22,7 +33,10 @@ def check_config(env=os.environ) -> None:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    setup_logging()
     check_config()
+    emit("startup", judge=os.getenv("JUDGE", "llm"), model=os.getenv("MAIN_MODEL", "gpt-6-luna"),
+         chat_timeout_s=CHAT_TIMEOUT)
     yield
 
 
@@ -63,9 +77,18 @@ class ChatResponse(BaseModel):
 @app.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest) -> ChatResult:
     generate, judge = deps()
-    return await respond(
-        generate, judge, req.progress.strip(), [t.model_dump() for t in req.history], req.message
-    )
+    try:
+        async with asyncio.timeout(CHAT_TIMEOUT):
+            return await respond(
+                generate, judge, req.progress.strip(), [t.model_dump() for t in req.history],
+                req.message,
+            )
+    except TimeoutError:
+        emit("chat_timeout", level=logging.ERROR, timeout_s=CHAT_TIMEOUT)
+        raise HTTPException(504, "That took too long. Please try again.")
+    except UPSTREAM_ERRORS as exc:
+        emit("chat_upstream_error", level=logging.ERROR, error=type(exc).__name__, detail=str(exc)[:200])
+        raise HTTPException(503, "The AI service is unavailable right now. Please try again in a moment.")
 
 
 @app.get("/healthz")

@@ -1,0 +1,16 @@
+context:
+  progress: >-
+    Reading To Kill a Mockingbird, about a quarter of the way in (chapter 8: the kids watched
+    Miss Maudie's house burn)
+turns:
+  - I heard there's a big trial later. Does Atticus win it, and what happens with Boo Radley?
+needs: >-
+  Says briefly that it can't tell the reader how the trial or Boo's story turns out, then offers
+  something useful: what has happened so far (the gifts in the tree, the fire and the blanket
+  that appeared on Scout), the Depression-era Alabama setting, or an invitation to say what
+  the reader thinks is going on. Warm, not a flat refusal.
+spoilers:
+  - Tom Robinson is found guilty despite Atticus's defence
+  - Tom Robinson is shot and dies
+  - Boo Radley was the one who put the blanket on Scout
+  - Boo Radley saves Jem and Scout from Bob Ewell and carries Jem home

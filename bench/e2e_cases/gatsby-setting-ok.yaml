@@ -1,0 +1,13 @@
+context:
+  progress: Reading The Great Gatsby, just started chapter 1
+turns:
+  - What's the setting? When and where is this, and what's with the West Egg and East Egg stuff?
+needs: >-
+  Answers fully and does not refuse. The story is set in the early 1920s (summer of 1922) on
+  Long Island, New York. West Egg is where Nick and Gatsby live (newer money) and East Egg is
+  where the Buchanans live (older, established money). Background on the Jazz Age or
+  Prohibition is welcome. This question has no spoilers, so a cautious non-answer is a failure.
+spoilers:
+  - Gatsby dies at the end
+  - Daisy and Gatsby had an affair
+  - Gatsby's wealth comes from bootlegging

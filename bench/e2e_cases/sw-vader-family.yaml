@@ -1,0 +1,16 @@
+context:
+  progress: >-
+    Watching Star Wars: Episode IV - A New Hope for the first time, just after Obi-Wan gives
+    Luke his father's lightsaber
+turns:
+  - Who is Darth Vader? What's his deal with Luke's family?
+needs: >-
+  Describes Vader as the Empire's armoured enforcer who boarded Leia's ship, and relays what
+  Obi-Wan has said so far: Vader was a pupil of his who turned to the dark side and, in
+  Obi-Wan's account, betrayed and murdered Luke's father. Presents this as what the film has
+  told the reader, without hinting that the account will change.
+spoilers:
+  - Vader is Luke's father
+  - Vader was once Anakin Skywalker
+  - Luke and Leia are twins
+  - Obi-Wan's account of Luke's father's death is untrue or only true from a certain point of view
