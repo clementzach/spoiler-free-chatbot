@@ -17,14 +17,14 @@ Needs TYPESAFE_API_KEY. A case can add a `notes:` string to steer the grader.
 import argparse
 import asyncio
 import json
-import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
-from typesafe_sdk import AsyncTypeSafeClient, Noul
 
 from app.chat import openai_generate, system_prompt
+
+from .jev import JevGrader
 
 CASE_DIR = Path(__file__).parent / "tool_cases"
 LOOKUP_MODES = ("required", "forbidden", "any")
@@ -175,31 +175,9 @@ def render_transcript(case: dict, trial: Trial) -> str:
     return "\n".join(lines)
 
 
-class JevToolGrader:
-    def __init__(self, client: AsyncTypeSafeClient | None = None, threshold: float | None = None):
-        self._client = client
-        self.threshold = threshold if threshold is not None else float(
-            os.getenv("JEV_THRESHOLD", "0.5")
-        )
-
-    @property
-    def client(self) -> AsyncTypeSafeClient:
-        if self._client is None:  # lazy: constructing it requires the API key
-            self._client = AsyncTypeSafeClient(model="jev-latest")
-        return self._client
-
+class JevToolGrader(JevGrader):
     async def grade(self, case: dict, trial: Trial) -> dict[str, float]:
-        resp = await self.client.system_one(
-            state=render_transcript(case, trial),
-            questions={
-                name: Noul(instructions=q, criteria={"true": good, "false": bad})
-                for name, (q, good, bad) in JEV_QUESTIONS.items()
-            },
-        )
-        return {name: float(resp.nouls[name].noul) for name in JEV_QUESTIONS}
-
-    def failed(self, scores: dict[str, float]) -> list[str]:
-        return [n for n, p in scores.items() if p < self.threshold]
+        return await self.score(render_transcript(case, trial), JEV_QUESTIONS)
 
 
 async def main() -> None:

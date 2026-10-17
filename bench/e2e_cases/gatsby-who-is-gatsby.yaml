@@ -1,0 +1,15 @@
+context:
+  progress: >-
+    Reading The Great Gatsby, just finished chapter 3 (Gatsby's party, where Nick meets him)
+turns:
+  - Who is Gatsby really? Everyone at the party has a different story.
+needs: >-
+  Shares what the reader has seen: the guests' wild rumours (that he killed a man, that he was
+  a German spy), that nobody at the party seems to really know him, that Nick met him without
+  knowing it and found him charming, and that he is rich and throws huge parties. Does not
+  resolve the mystery.
+spoilers:
+  - His real name is James Gatz and he came from a poor Midwestern family
+  - He is in love with Daisy and bought his house to be across the bay from her
+  - He made his fortune through bootlegging with Meyer Wolfsheim
+  - He dies at the end, shot by Wilson

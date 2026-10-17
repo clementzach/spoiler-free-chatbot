@@ -5,9 +5,13 @@ import re
 
 import httpx
 
+from .resilience import with_retries
+
 API = "https://en.wikipedia.org/w/api.php"
 HEADERS = {"User-Agent": "spoiler-free-chatbot/0.1 (https://github.com/clementzach/spoiler-free-chatbot)"}
 MAX_CHARS = 6000
+RETRIES = 2
+LOOKUP_FAILED = "Lookup failed"  # prefix of the text a failed tool call returns to the model
 
 TOOLS = [
     {
@@ -41,11 +45,14 @@ TOOLS = [
 
 
 async def _get(http: httpx.AsyncClient, **params) -> dict:
-    r = await http.get(
-        API, params={"format": "json", "formatversion": 2, **params}, headers=HEADERS, timeout=10
-    )
-    r.raise_for_status()
-    return r.json()
+    async def call() -> dict:
+        r = await http.get(
+            API, params={"format": "json", "formatversion": 2, **params}, headers=HEADERS, timeout=10
+        )
+        r.raise_for_status()
+        return r.json()
+
+    return await with_retries(call, RETRIES, label="wikipedia")
 
 
 async def search(http: httpx.AsyncClient, query: str) -> str:
@@ -82,4 +89,4 @@ async def run_tool(http: httpx.AsyncClient, name: str, arguments: str) -> str:
             return await page(http, args["title"], bool(args.get("full")))
         return f"Unknown tool {name!r}."
     except Exception as exc:
-        return f"Lookup failed: {type(exc).__name__}"
+        return f"{LOOKUP_FAILED}: {type(exc).__name__}"

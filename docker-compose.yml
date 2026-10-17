@@ -7,3 +7,10 @@ services:
     environment:
       PORT: ${PORT:-8000}
     restart: unless-stopped
+    # Docker keeps container stdout forever by default, which is how logs fill an SD card.
+    # This caps them at 3 files x 5 MB per container.
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"

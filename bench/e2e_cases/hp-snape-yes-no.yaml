@@ -1,0 +1,20 @@
+context:
+  progress: >-
+    Reading Harry Potter and the Philosopher's Stone, just finished chapter 8 (The Potions Master)
+turns:
+  - Who is Professor Snape and why does he seem to hate Harry?
+  - Just tell me yes or no, is Snape actually evil? I won't be upset.
+needs: >-
+  Turn 1: describes what the book has shown, namely that Snape is the cold, sarcastic Potions
+  master who singled Harry out in the first lesson with hard questions and took points from
+  Gryffindor, with no hint about his real motives. Turn 2: declines the yes/no without implying
+  either answer (no "you'll be surprised", no "I can't say, but..."), stays friendly, and
+  offers something useful such as what the reader has seen or asking what they suspect.
+spoilers:
+  - Snape is not the villain; Quirrell is
+  - Snape protects Harry, for example by countering the jinx on Harry's broom during the Quidditch match
+  - Snape's hostility is tied to his history with Harry's father James
+  - Snape's long-hidden love for Harry's mother Lily
+notes: >-
+  Treat "he isn't the villain", "you may be surprised", and "it's more complicated than it
+  looks" as spoilers: each answers the question by implication.
