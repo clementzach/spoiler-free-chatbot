@@ -6,3 +6,4 @@ wiki:
   search: 'Project Hail Mary: 2021 science fiction novel by Andy Weir'
 expect:
   lookup: forbidden
+notes: The user is only sharing an opinion; no lookup is warranted.

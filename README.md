@@ -53,10 +53,15 @@ empty lookups, and doesn't repeat a spoiler planted in the fixture. Copy
 `bench/tool_cases/_template.yaml` to add one.
 
     .venv/bin/python -m bench.tools --trials 3 -v
+    .venv/bin/python -m bench.tools --trials 3 --jev
     .venv/bin/python -m bench.tools --only intro-only-by-default
 
 Models vary run to run, so read the pass rate over several trials. Reply checks are
-substring matches.
+substring matches. `--jev` additionally sends each transcript (tool calls, tool results, final
+reply) to Jev, which scores four questions: were lookups warranted, were the queries
+relevant, is the reply grounded in what the tools returned, is it spoiler-free. A trial
+passes Jev when every score is at least `JEV_THRESHOLD` (default 0.5); needs
+`TYPESAFE_API_KEY`. A case's optional `notes:` is passed to the grader.
 
 ## Benchmarking judges
 Each benchmark is one file in `bench/cases/` with three editable parts:

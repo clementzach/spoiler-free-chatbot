@@ -8,3 +8,4 @@ expect:
   lookup: required
   reply_contains_any:
   - Rothfuss
+notes: Every lookup failed. Answering from well-known knowledge is fine if the reply doesn't claim to have verified it.

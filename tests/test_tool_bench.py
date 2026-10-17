@@ -3,7 +3,8 @@ from types import SimpleNamespace as NS
 
 import pytest
 
-from bench.tools import StubWiki, check, load_tool_cases, run_trial
+from bench.tools import (JEV_QUESTIONS, JevToolGrader, StubWiki, Trial, check, load_tool_cases,
+                         render_transcript, run_trial)
 
 
 def test_cases_load_and_are_well_formed():
@@ -56,5 +57,39 @@ async def test_run_trial_end_to_end_with_fake_model():
         return replies.pop(0)
 
     client = NS(chat=NS(completions=NS(create=create)))
-    fails, calls, reply = await run_trial(case, client=client)
-    assert fails == [] and calls == [("wikipedia_search", {"query": "Dune author"})]
+    trial = await run_trial(case, client=client)
+    assert trial.fails == [] and trial.calls == [("wikipedia_search", {"query": "Dune author"})]
+    assert trial.results == ["Dune (novel): by Frank Herbert"] and trial.reply == "Frank Herbert."
+
+
+class FakeSystemOne:
+    def __init__(self, scores):
+        self.scores, self.kwargs = scores, None
+
+    async def system_one(self, **kw):
+        self.kwargs = kw
+        return NS(nouls={k: NS(noul=v) for k, v in self.scores.items()})
+
+
+def test_transcript_has_calls_results_reply_and_notes():
+    case = {"context": {"progress": "Dune, ch. 3", "user_message": "Who wrote it?"}, "notes": "be strict"}
+    trial = Trial([], [("wikipedia_search", {"query": "Dune"})], ["Dune (novel): by Frank Herbert"], "Herbert.")
+    text = render_transcript(case, trial)
+    for want in ("Dune, ch. 3", "USER: Who wrote it?", 'wikipedia_search({"query": "Dune"}) -> Dune (novel)',
+                 "FINAL REPLY:\nHerbert.", "EVALUATOR NOTES: be strict"):
+        assert want in text
+    assert "(none)" in render_transcript(case, Trial([], [], [], "hi"))
+
+
+@pytest.mark.asyncio
+async def test_jev_grader_request_shape_and_threshold():
+    scores = {"lookup_appropriate": 0.9, "queries_relevant": 0.8, "grounded": 0.3, "spoiler_free": 0.95}
+    fake = FakeSystemOne(scores)
+    g = JevToolGrader(client=fake, threshold=0.5)
+    case = {"context": {"progress": "p", "user_message": "q"}}
+    got = await g.grade(case, Trial([], [], [], "reply"))
+    assert got == scores and g.failed(got) == ["grounded"]
+    qs = fake.kwargs["questions"]
+    assert set(qs) == set(JEV_QUESTIONS)
+    assert all(q.type == "noul" and set(q.criteria) == {"true", "false"} for q in qs.values())
+    assert "FINAL REPLY" in fake.kwargs["state"]
