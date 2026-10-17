@@ -69,20 +69,36 @@ async def test_rejected_drafts_not_in_next_turn_context():
     assert all("spoiler" != m["content"] for m in seen2[0])
 
 
+
+def _msg(content=None, calls=()):
+    from types import SimpleNamespace as NS
+
+    tool_calls = [NS(id=i, function=NS(name=n, arguments=a)) for i, n, a in calls] or None
+    return NS(choices=[NS(message=NS(content=content, tool_calls=tool_calls))])
+
+
 @pytest.mark.asyncio
-async def test_openai_generate_uses_responses_api_with_web_search():
+async def test_openai_generate_runs_wikipedia_tool_then_answers(monkeypatch):
     from types import SimpleNamespace
 
+    from app import wiki
     from app.chat import openai_generate
 
-    calls = []
+    looked_up = []
+
+    async def fake_run_tool(http, name, arguments):
+        looked_up.append((name, arguments))
+        return "Dune: a 1965 novel"
+
+    monkeypatch.setattr(wiki, "run_tool", fake_run_tool)
+    replies = [_msg(calls=[("c1", "wikipedia_search", '{"query": "dune"}')]), _msg("grounded")]
+    seen = []
 
     async def create(**kw):
-        calls.append(kw)
-        return SimpleNamespace(output_text="grounded")
+        seen.append(list(kw["messages"]))
+        return replies.pop(0)
 
-    client = SimpleNamespace(responses=SimpleNamespace(create=create))
-    msgs = [{"role": "user", "content": "hi"}]
-    assert await openai_generate(client)(msgs) == "grounded"
-    assert calls[0]["model"] == "gpt-6-luna" and calls[0]["input"] == msgs
-    assert calls[0]["tools"] == [{"type": "web_search"}]
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
+    out = await openai_generate(client)([{"role": "user", "content": "hi"}])
+    assert out == "grounded" and looked_up == [("wikipedia_search", '{"query": "dune"}')]
+    assert seen[1][-1] == {"role": "tool", "tool_call_id": "c1", "content": "Dune: a 1965 novel"}

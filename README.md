@@ -12,10 +12,11 @@ Each draft reply is checked by a judge; a draft that spoils is rejected and rege
     cp .env.example .env   # fill in keys, then: set -a; . ./.env; set +a
     .venv/bin/uvicorn app.main:app --reload
 
-## Web search
-The chat model runs through OpenAI's Responses API with the built-in `web_search` tool, so facts
-are grounded in live results. Searches are billed per call on top of tokens. Drafts that
-quote spoilery results are still caught by the judge, which doesn't see the search results.
+## Wikipedia grounding
+The chat model can call two tools (`app/wiki.py`): `wikipedia_search` (full-text search, so
+no exact title needed) and `wikipedia_page` (intro by default, whole article on request,
+truncated). Free, no key. Articles often contain plot sections, so the judge still checks every
+draft, but it doesn't see what the model looked up.
 
 ## Configuration
 See `.env.example`. `OPENAI_API_KEY` is always required (chat model); `TYPESAFE_API_KEY`
