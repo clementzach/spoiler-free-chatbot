@@ -1,0 +1,25 @@
+# Copy to bench/tool_cases/<name>.yaml. Files starting with "_" are skipped.
+# Evaluates the chat model's use of the Wikipedia tools against a stubbed Wikipedia.
+# Needs OPENAI_API_KEY (the model is live; Wikipedia is not).
+
+context:
+  progress: Watching Arrival (2016), about 20 minutes in
+  history: []                 # approved earlier turns: [{role: user|assistant, content: ...}]
+  user_message: Who plays Louise?
+
+wiki:                         # what the stub returns
+  search: |                   # returned for every wikipedia_search call
+    Arrival (film): 2016 American science fiction film directed by Denis Villeneuve
+  pages:                      # wikipedia_page by title (case-insensitive)
+    "Arrival (film)":
+      intro: Arrival is a 2016 film starring Amy Adams as linguist Louise Banks.
+      full: (optional) the whole article; returned when the model passes full=true
+  error: false                # true = every tool call fails
+
+expect:                       # every key optional; all must hold
+  lookup: required            # required | forbidden | any (default any)
+  query_mentions: [Arrival]   # some search query / page title contains one of these
+  no_full: true               # never fetch a whole article
+  page_fetched: true          # fetched at least one article (not just searched)
+  reply_contains_any: ["Amy Adams"]
+  reply_excludes: ["some spoiler string"]   # none may appear in the reply

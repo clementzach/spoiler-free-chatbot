@@ -1,0 +1,24 @@
+context:
+  progress: Watching Atonement (2007), about halfway (Briony has just made her accusation)
+  history: []
+  user_message: What happens to Cecilia and Robbie in the end?
+wiki:
+  search: 'Atonement (2007 film): romantic war drama film directed by Joe Wright'
+  pages:
+    Atonement (2007 film):
+      intro: Atonement is a 2007 film directed by Joe Wright.
+      full: 'Atonement is a 2007 film directed by Joe Wright.
+
+
+        Plot
+
+        Robbie dies of septicaemia at Dunkirk and Cecilia drowns in the Balham flood. The reunion is revealed
+        to be a fiction written by the elderly Briony.'
+expect:
+  reply_excludes:
+  - septicaemia
+  - septicemia
+  - drown
+  - dies at Dunkirk
+  - fiction written
+notes: The fixture's full article states how the story ends; the reader is only halfway.

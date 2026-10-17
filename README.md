@@ -12,10 +12,16 @@ Each draft reply is checked by a judge; a draft that spoils is rejected and rege
     cp .env.example .env   # fill in keys, then: set -a; . ./.env; set +a
     .venv/bin/uvicorn app.main:app --reload
 
+## Wikipedia grounding
+The chat model can call two tools (`app/wiki.py`): `wikipedia_search` (full-text search, so
+no exact title needed) and `wikipedia_page` (intro by default, whole article on request,
+truncated). Free, no key. Articles often contain plot sections, so the judge still checks every
+draft, but it doesn't see what the model looked up.
+
 ## Configuration
 See `.env.example`. `OPENAI_API_KEY` is always required (chat model); `TYPESAFE_API_KEY`
 is also required when `JUDGE=jev`. The app refuses to start if a required key is missing.
-Optional: `JUDGE` (`llm` default, `decisions`, `jev`), `MAIN_MODEL`, `JUDGE_MODEL`,
+Optional: `JUDGE` (`llm` default, `decisions`, `jev`), `MAIN_MODEL` (default `gpt-6-luna`), `JUDGE_MODEL`,
 `DECISIONS_THRESHOLD`, `JEV_THRESHOLD`, `PORT`.
 
 ## Deploy on a Raspberry Pi (Docker)
@@ -36,6 +42,29 @@ There is no authentication or rate limiting, so keep it on your home network. Do
 port-forward it to the internet without adding both, since every message costs API calls.
 
 No server state: the browser sends the approved history and the reader's progress each turn.
+
+Live checks against the real Wikipedia API (search, intro vs full article, redirects, missing
+titles) are skipped by default so tests stay offline: `.venv/bin/pytest -m live`.
+
+## Tool-use evals
+`bench/tool_cases/` checks how the chat model uses the Wikipedia tools. The model is live
+(needs `OPENAI_API_KEY`); Wikipedia is a per-case fixture, so results don't depend on the
+network. Checks cover: looks up when it should and not for chit-chat, queries mention the
+work (including when the title comes from the reader's progress), fetches the article when a
+snippet isn't enough, stays on the intro rather than `full=true`, recovers from failed or
+empty lookups, and doesn't repeat a spoiler planted in the fixture. Copy
+`bench/tool_cases/_template.yaml` to add one.
+
+    .venv/bin/python -m bench.tools --trials 3 -v
+    .venv/bin/python -m bench.tools --trials 3 --jev
+    .venv/bin/python -m bench.tools --only intro-only-by-default
+
+Models vary run to run, so read the pass rate over several trials. Reply checks are
+substring matches. `--jev` additionally sends each transcript (tool calls, tool results, final
+reply) to Jev, which scores four questions: were lookups warranted, were the queries
+relevant, is the reply grounded in what the tools returned, is it spoiler-free. A trial
+passes Jev when every score is at least `JEV_THRESHOLD` (default 0.5); needs
+`TYPESAFE_API_KEY`. A case's optional `notes:` is passed to the grader.
 
 ## Benchmarking judges
 Each benchmark is one file in `bench/cases/` with three editable parts:

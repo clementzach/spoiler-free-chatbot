@@ -1,0 +1,16 @@
+context:
+  progress: Dune, about 100 pages in (Paul has just met the Fremen)
+  history: []
+  user_message: Who wrote it, and when?
+wiki:
+  search: 'Dune (novel): 1965 science fiction novel by American author Frank Herbert'
+  pages:
+    Dune (novel):
+      intro: Dune is a 1965 science fiction novel by American author Frank Herbert, originally published
+        as two separate serials in Analog magazine.
+expect:
+  lookup: required
+  query_mentions:
+  - Dune
+  reply_contains_any:
+  - Herbert

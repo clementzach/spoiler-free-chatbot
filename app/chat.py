@@ -2,12 +2,15 @@ import os
 from dataclasses import dataclass
 from typing import Awaitable, Callable
 
+import httpx
 from openai import AsyncOpenAI
 
+from . import wiki
 from .judges import Judge, JudgeResult
 from .policy import SPOILER_POLICY
 
 MAX_ATTEMPTS = 2
+MAX_TOOL_ROUNDS = 4
 FALLBACK = (
     "I couldn't answer that without risking a spoiler for where you are. "
     "Try rephrasing, or ask about something else."
@@ -22,17 +25,55 @@ def system_prompt(progress: str) -> str:
         f"{SPOILER_POLICY}\n\n"
         "If a question can't be answered without a spoiler, say so briefly and offer "
         "what you can talk about instead.\n\n"
+        "You can look things up on Wikipedia (search first; you don't need the exact title) "
+        "instead of relying on memory. Articles often contain spoilers: use them only to "
+        "verify what you're allowed to say, and apply the policy above to anything you "
+        "quote or paraphrase from them.\n\n"
         f"What the reader is reading and how far they've got:\n\"{progress}\""
     )
 
 
-def openai_generate(client: AsyncOpenAI | None = None, model: str | None = None) -> Generate:
-    client = client or AsyncOpenAI()
-    model = model or os.getenv("MAIN_MODEL", "gpt-4.1")
+ToolRunner = Callable[[str, str], Awaitable[str]]  # (tool name, JSON arguments) -> result text
 
-    async def generate(messages: list[dict]) -> str:
+
+def openai_generate(
+    client: AsyncOpenAI | None = None,
+    model: str | None = None,
+    run_tool: ToolRunner | None = None,
+) -> Generate:
+    """`run_tool` defaults to live Wikipedia; benchmarks inject a stub."""
+    client = client or AsyncOpenAI()
+    model = model or os.getenv("MAIN_MODEL", "gpt-6-luna")
+
+    async def loop(messages: list[dict], run: ToolRunner) -> str:
+        for _ in range(MAX_TOOL_ROUNDS):
+            resp = await client.chat.completions.create(
+                model=model, messages=messages, tools=wiki.TOOLS
+            )
+            msg = resp.choices[0].message
+            if not msg.tool_calls:
+                return msg.content or ""
+            messages.append({
+                "role": "assistant",
+                "content": msg.content,
+                "tool_calls": [
+                    {"id": c.id, "type": "function",
+                     "function": {"name": c.function.name, "arguments": c.function.arguments}}
+                    for c in msg.tool_calls
+                ],
+            })
+            for c in msg.tool_calls:
+                result = await run(c.function.name, c.function.arguments)
+                messages.append({"role": "tool", "tool_call_id": c.id, "content": result})
+        # Out of lookups: ask for an answer without tools.
         resp = await client.chat.completions.create(model=model, messages=messages)
         return resp.choices[0].message.content or ""
+
+    async def generate(messages: list[dict]) -> str:
+        if run_tool is not None:
+            return await loop(list(messages), run_tool)
+        async with httpx.AsyncClient() as http:
+            return await loop(list(messages), lambda n, a: wiki.run_tool(http, n, a))
 
     return generate
 

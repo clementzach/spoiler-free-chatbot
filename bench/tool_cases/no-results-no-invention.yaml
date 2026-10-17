@@ -1,0 +1,30 @@
+context:
+  progress: Watching a show called Zorblax Hollow, season 1
+  history: []
+  user_message: Who created Zorblax Hollow?
+wiki:
+  search: No results.
+expect:
+  lookup: required
+  reply_contains_any:
+  - couldn't find
+  - could not find
+  - can't find
+  - cannot find
+  - no information
+  - not able to
+  - don't have
+  - do not have
+  - unable
+  - not sure
+  - don't know
+  - no results
+  - isn't
+  - not familiar
+  - don't recognize
+  - do not recognize
+  - didn't find
+  - did not find
+  - no record
+  - unfamiliar
+notes: Zorblax Hollow is not a real show. The search returned no results, so the right reply says it couldn't find it and does not invent a creator.

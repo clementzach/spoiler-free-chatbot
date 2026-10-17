@@ -1,0 +1,17 @@
+context:
+  progress: Watching Pride & Prejudice (2005), about 20 minutes in (the Netherfield ball is coming up)
+  history: []
+  user_message: Who directed this version and who plays Elizabeth?
+wiki:
+  search: 'Pride & Prejudice (2005 film): 2005 British romantic drama film directed by Joe Wright, starring
+    Keira Knightley'
+  pages:
+    Pride & Prejudice (2005 film):
+      intro: Pride & Prejudice is a 2005 romantic drama film directed by Joe Wright, based on Jane Austen's
+        1813 novel. Keira Knightley stars as Elizabeth Bennet, with Matthew Macfadyen as Mr Darcy.
+expect:
+  lookup: required
+  query_mentions:
+  - Pride
+  reply_contains_any:
+  - Joe Wright

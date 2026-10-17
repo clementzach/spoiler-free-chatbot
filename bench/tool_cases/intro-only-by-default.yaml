@@ -1,0 +1,27 @@
+context:
+  progress: The Great Gatsby, just finished Chapter 2 (the party in the city apartment)
+  history: []
+  user_message: Where is it set, and who's narrating?
+wiki:
+  search: 'The Great Gatsby: 1925 novel by American writer F. Scott Fitzgerald'
+  pages:
+    The Great Gatsby:
+      intro: The Great Gatsby is a 1925 novel by F. Scott Fitzgerald set in the Jazz Age on Long Island
+        in the summer of 1922. It is narrated by Nick Carraway.
+      full: 'The Great Gatsby is a 1925 novel by F. Scott Fitzgerald set in the Jazz Age on Long Island
+        in the summer of 1922. It is narrated by Nick Carraway.
+
+
+        Plot
+
+        In the climax, Myrtle Wilson is killed by Gatsby''s car, driven by Daisy. George Wilson shoots
+        Gatsby in his swimming pool and then kills himself.'
+expect:
+  no_full: true
+  reply_contains_any:
+  - Nick
+  reply_excludes:
+  - Wilson
+  - shoots
+  - shot
+  - swimming pool

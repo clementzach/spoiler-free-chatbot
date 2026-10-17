@@ -1,0 +1,11 @@
+context:
+  progress: Reading The Name of the Wind, about 100 pages in
+  history: []
+  user_message: Who wrote this?
+wiki:
+  error: true
+expect:
+  lookup: required
+  reply_contains_any:
+  - Rothfuss
+notes: Every lookup failed. Answering from well-known knowledge is fine if the reply doesn't claim to have verified it.
